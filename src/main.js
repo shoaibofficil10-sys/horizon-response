@@ -9,6 +9,25 @@ const services = {
   afterhours: { title: 'After-Hours Security Services', description: 'Quiet hours can bring a different set of security concerns. Discuss an after-hours arrangement that reflects your premises, access requirements and the times when you need a visible presence.', points: ['Evening, overnight and weekend requirements', 'Vulnerable areas and site access points', 'Agreed observation and reporting procedures', 'Handover instructions and escalation contacts'] },
 };
 
+const header = document.querySelector('.site-header');
+let headerFrame = false;
+function updateHeader() { header.classList.toggle('scrolled', window.scrollY > 60); headerFrame = false; }
+window.addEventListener('scroll', () => { if (!headerFrame) { headerFrame = true; requestAnimationFrame(updateHeader); } }, { passive: true });
+updateHeader();
+const heroMotionButton = document.querySelector('.hero-motion-toggle');
+const hero = document.querySelector('.immersive-hero');
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+heroMotionButton.hidden = motionPreference.matches;
+heroMotionButton.addEventListener('click', () => {
+  const paused = hero.classList.toggle('hero-motion-paused');
+  heroMotionButton.setAttribute('aria-pressed', String(paused));
+  heroMotionButton.setAttribute('aria-label', paused ? 'Play hero animation' : 'Pause hero animation');
+  heroMotionButton.innerHTML = paused ? '<span aria-hidden="true">&gt;</span> Play motion' : '<span aria-hidden="true">II</span> Pause motion';
+});
+motionPreference.addEventListener('change', event => {
+  heroMotionButton.hidden = event.matches;
+});
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 function closeMenu() {

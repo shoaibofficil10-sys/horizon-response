@@ -1,6 +1,6 @@
 # Horizon Response
 
-A minimalist, photographic security services homepage built with Vite and locally hosted variable fonts. Includes a custom security-officer hero, six image-led service cards, accessible service dialogs, mobile navigation, reduced-motion support, a two-step security brief builder and an aligned footer. The HR identity uses black, white and neutral greys.
+A minimalist, photographic security services homepage built with Vite and locally hosted variable fonts. Includes a full-viewport security portrait hero with overlay navigation, a soft blurred foreground, staged text entrance, subtle photograph motion with a pause control and a working service selector; six image-led service cards, accessible service dialogs, mobile navigation, reduced-motion support, a two-step security brief builder and an aligned footer. The HR identity uses black, white and neutral greys. The immersive hero composition was informed by a visual review of the public Pinterest reference at https://www.pinterest.com/pin/713609503496683293/. The hero uses a newly generated photograph animated in CSS, not the reference footage.
 
 The brief builder guides visitors through service/site requirements and contact details, then creates a local downloadable or copyable brief. It does not submit an enquiry or persist personal data. A transparent PNG of the two hero security officers is available in `public/images/security-officers-transparent.png`.
 

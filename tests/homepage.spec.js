@@ -143,3 +143,18 @@ test('two-step brief preserves entries when requirements are edited', async ({ p
   await expect(page.locator('#requirements-panel')).toBeVisible();
   await expect(page.locator('input[name=service]:checked')).toHaveValue('Event Security & Crowd Control');
 });
+
+test('immersive hero motion can pause and its service selector opens the right details', async ({ page }) => {
+  await page.goto('/');
+  const motion = page.locator('.hero-motion-toggle');
+  await motion.click();
+  await expect(motion).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.locator('.hero-photo').evaluate(el => getComputedStyle(el).animationPlayState)).toBe('paused');
+  await motion.click();
+  await expect(motion).toHaveAttribute('aria-pressed', 'false');
+  await page.locator('.hero-panel').getByRole('button', { name: 'Your event' }).click();
+  await expect(page.locator('#dialog-title')).toHaveText('Event Security & Crowd Control');
+  await page.keyboard.press('Escape');
+  await page.locator('#services').scrollIntoViewIfNeeded();
+  await expect(page.locator('.site-header')).toHaveClass(/scrolled/);
+});
