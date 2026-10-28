@@ -144,17 +144,30 @@ test('two-step brief preserves entries when requirements are edited', async ({ p
   await expect(page.locator('input[name=service]:checked')).toHaveValue('Event Security & Crowd Control');
 });
 
-test('immersive hero motion can pause and its service selector opens the right details', async ({ page }) => {
+test('hero lead form validates details and carries them into the full enquiry brief', async ({ page }) => {
+  const posts = [];
+  page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()); });
   await page.goto('/');
-  const motion = page.locator('.hero-motion-toggle');
-  await motion.click();
-  await expect(motion).toHaveAttribute('aria-pressed', 'true');
-  expect(await page.locator('.hero-photo').evaluate(el => getComputedStyle(el).animationPlayState)).toBe('paused');
-  await motion.click();
-  await expect(motion).toHaveAttribute('aria-pressed', 'false');
-  await page.locator('.hero-panel').getByRole('button', { name: 'Your event' }).click();
-  await expect(page.locator('#dialog-title')).toHaveText('Event Security & Crowd Control');
-  await page.keyboard.press('Escape');
-  await page.locator('#services').scrollIntoViewIfNeeded();
-  await expect(page.locator('.site-header')).toHaveClass(/scrolled/);
+  expect(await page.locator('.hero-photo').evaluate(img => getComputedStyle(img).objectFit)).toBe('contain');
+  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-event-real.webp');
+  await expect(page.locator('.photo-credit')).toHaveAttribute('href', /pexels.com.*34585117/);
+  await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
+  await expect(page.getByLabel('Full name', { exact: false })).toBeFocused();
+  await page.getByLabel('Full name').fill('Jamie Example');
+  await page.getByLabel('Work email').fill('jamie@example.com');
+  await page.getByLabel('Phone number', { exact: true }).fill('0400 111 222');
+  await page.getByLabel('Security service', { exact: false }).selectOption('Warehouse & Industrial Security');
+  await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
+  await expect(page.getByLabel('Site location')).toBeFocused();
+  await expect(page.locator('input[name=service]:checked')).toHaveValue('Warehouse & Industrial Security');
+  await page.getByLabel('Site location').fill('Perth, WA');
+  await page.getByLabel('What do you have in mind?').fill('Warehouse entry and visitor management.');
+  await page.getByRole('button', { name: 'Continue to your details' }).click();
+  await expect(page.getByLabel('Your name')).toHaveValue('Jamie Example');
+  await expect(page.getByLabel('Email address')).toHaveValue('jamie@example.com');
+  await expect(page.getByLabel('Phone / mobile')).toHaveValue('0400 111 222');
+  await page.getByRole('button', { name: 'Prepare my security brief' }).click();
+  await expect(page.locator('#brief-preview')).toContainText('Warehouse & Industrial Security');
+  await expect(page.locator('#brief-preview')).toContainText('Jamie Example');
+  expect(posts).toEqual([]);
 });

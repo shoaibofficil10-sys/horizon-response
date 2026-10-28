@@ -14,20 +14,6 @@ let headerFrame = false;
 function updateHeader() { header.classList.toggle('scrolled', window.scrollY > 60); headerFrame = false; }
 window.addEventListener('scroll', () => { if (!headerFrame) { headerFrame = true; requestAnimationFrame(updateHeader); } }, { passive: true });
 updateHeader();
-const heroMotionButton = document.querySelector('.hero-motion-toggle');
-const hero = document.querySelector('.immersive-hero');
-const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-heroMotionButton.hidden = motionPreference.matches;
-heroMotionButton.addEventListener('click', () => {
-  const paused = hero.classList.toggle('hero-motion-paused');
-  heroMotionButton.setAttribute('aria-pressed', String(paused));
-  heroMotionButton.setAttribute('aria-label', paused ? 'Play hero animation' : 'Pause hero animation');
-  heroMotionButton.innerHTML = paused ? '<span aria-hidden="true">&gt;</span> Play motion' : '<span aria-hidden="true">II</span> Pause motion';
-});
-motionPreference.addEventListener('change', event => {
-  heroMotionButton.hidden = event.matches;
-});
-
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 function closeMenu() {
@@ -142,6 +128,25 @@ form.addEventListener('submit', event => {
   openDialog(document.getElementById('brief-dialog'));
 });
 form.querySelectorAll('[required]').forEach(input => input.addEventListener('input', () => input.setCustomValidity('')));
+const heroLeadForm = document.getElementById('hero-lead-form');
+heroLeadForm.addEventListener('submit', event => {
+  event.preventDefault();
+  for (const field of heroLeadForm.querySelectorAll('[required]')) {
+    field.setCustomValidity(field.value.trim() ? '' : 'Please enter a value.');
+    if (!field.reportValidity()) return;
+  }
+  const data = new FormData(heroLeadForm);
+  document.getElementById('name').value = data.get('name').trim();
+  document.getElementById('email').value = data.get('email').trim();
+  document.getElementById('phone').value = data.get('phone').trim();
+  const service = [...form.querySelectorAll('input[name=service]')].find(input => input.value === data.get('service'));
+  if (service) service.checked = true;
+  showBriefStep(1);
+  document.getElementById('contact').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  document.getElementById('location').focus({ preventScroll: true });
+});
+heroLeadForm.querySelectorAll('[required]').forEach(field => field.addEventListener('input', () => field.setCustomValidity('')));
+
 document.getElementById('download-brief').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([currentBrief], {type: 'text/plain;charset=utf-8'}));
   const link = document.createElement('a'); link.href = url; link.download = 'horizon-response-security-brief.txt';
