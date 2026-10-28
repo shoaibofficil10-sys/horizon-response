@@ -9,70 +9,6 @@ const services = {
   afterhours: { title: 'After-Hours Security Services', description: 'Quiet hours can bring a different set of security concerns. Discuss an after-hours arrangement that reflects your premises, access requirements and the times when you need a visible presence.', points: ['Evening, overnight and weekend requirements', 'Vulnerable areas and site access points', 'Agreed observation and reporting procedures', 'Handover instructions and escalation contacts'] },
 };
 
-const serviceVisuals = {
-  static: { image: 'horizon-lobby.webp', alt: 'A security officer at a modern commercial reception', caption: 'A professional presence. A reassuring first impression.' },
-  construction: { image: 'horizon-construction.webp', alt: 'Security officer overseeing access at a construction site', caption: 'Keep your project moving in the right direction.' },
-  warehouse: { image: 'horizon-site.webp', alt: 'Modern warehouse and industrial facility at dusk', caption: 'Protection that works around your operations.' },
-  event: { image: 'horizon-event.webp', alt: 'Professional security officer welcoming guests to an evening event', caption: 'A safe environment. A better experience.' },
-  residential: { image: 'horizon-residential.webp', alt: 'Security officer and resident in a landscaped residential community', caption: 'A familiar presence. A community at ease.' },
-  afterhours: { image: 'horizon-hero.webp', alt: 'Security officer overlooking commercial premises at blue hour', caption: 'When the day ends, attention shouldn’t.' },
-};
-const serviceKeys = Object.keys(serviceVisuals);
-function selectService(key) {
-  document.querySelectorAll('.service-card').forEach(card => {
-    const active = card.dataset.panel === key;
-    card.classList.toggle('active', active);
-    card.querySelector('.service-tab').setAttribute('aria-expanded', String(active));
-    card.querySelector('.service-description').hidden = !active;
-  });
-  const visual = serviceVisuals[key];
-  const image = document.getElementById('service-image');
-  image.src = `/images/${visual.image}`;
-  image.alt = visual.alt;
-  document.getElementById('service-image-title').textContent = visual.caption;
-  document.getElementById('service-count').textContent = `0${serviceKeys.indexOf(key) + 1} / 06`;
-}
-document.querySelectorAll('[data-select-service]').forEach(button => button.addEventListener('click', () => selectService(button.dataset.selectService)));
-document.querySelectorAll('[data-environment]').forEach(link => link.addEventListener('click', () => selectService(link.dataset.environment)));
-
-const stage = document.querySelector('.hero-stage');
-const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-let motionPaused = motionPreference.matches;
-stage.addEventListener('pointermove', event => {
-  if (motionPaused || event.pointerType !== 'mouse') return;
-  const rect = stage.getBoundingClientRect();
-  stage.style.setProperty('--shield-ry', `${((event.clientX - rect.left) / rect.width - .5) * 12}deg`);
-  stage.style.setProperty('--shield-rx', `${((event.clientY - rect.top) / rect.height - .5) * -8}deg`);
-});
-stage.addEventListener('pointerleave', () => {
-  stage.style.setProperty('--shield-ry', '0deg');
-  stage.style.setProperty('--shield-rx', '0deg');
-});
-const motionButton = document.createElement('button');
-motionButton.className = 'motion-toggle';
-motionButton.textContent = 'II PAUSE MOTION';
-motionButton.setAttribute('aria-label', 'Pause decorative animations');
-motionButton.setAttribute('aria-pressed', 'false');
-motionButton.hidden = motionPreference.matches;
-stage.append(motionButton);
-motionButton.addEventListener('click', () => {
-  motionPaused = !motionPaused;
-  document.body.classList.toggle('motion-paused', motionPaused);
-  motionButton.textContent = motionPaused ? '> PLAY MOTION' : 'II PAUSE MOTION';
-  motionButton.setAttribute('aria-label', motionPaused ? 'Play decorative animations' : 'Pause decorative animations');
-  motionButton.setAttribute('aria-pressed', String(motionPaused));
-  if (motionPaused) stage.style.setProperty('--shield-ry', '0deg');
-  if (motionPaused) stage.style.setProperty('--shield-rx', '0deg');
-});
-motionPreference.addEventListener('change', event => {
-  motionPaused = event.matches;
-  motionButton.hidden = event.matches;
-  document.body.classList.remove('motion-paused');
-  motionButton.textContent = 'II PAUSE MOTION';
-  motionButton.setAttribute('aria-label', 'Pause decorative animations');
-  motionButton.setAttribute('aria-pressed', 'false');
-});
-
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 function closeMenu() {
@@ -126,27 +62,67 @@ document.querySelectorAll('[data-service]').forEach(button => button.addEventLis
   openDialog(serviceDialog);
 }));
 document.getElementById('dialog-enquire').addEventListener('click', () => {
-  const select = document.getElementById('service');
-  select.value = selectedService;
+  const input = [...document.querySelectorAll('input[name=service]')].find(input => input.value === selectedService);
+  if (input) input.checked = true;
+  showBriefStep(1);
   serviceDialog.close();
   document.getElementById('contact').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-  document.getElementById('name').focus({ preventScroll: true });
+  document.getElementById('location').focus({ preventScroll: true });
 });
 
+const form = document.getElementById('brief-form');
+const requirementsPanel = document.getElementById('requirements-panel');
+const detailsPanel = document.getElementById('details-panel');
+function showBriefStep(step) {
+  const details = step === 2;
+  requirementsPanel.hidden = details;
+  detailsPanel.hidden = !details;
+  document.getElementById('form-step-number').textContent = details ? '02' : '01';
+  document.getElementById('form-step-caption').textContent = details ? 'YOUR DETAILS' : 'YOUR REQUIREMENTS';
+  document.getElementById('form-step-title').textContent = details ? 'Who should the brief be prepared for?' : 'A little about your security needs.';
+  document.getElementById('form-step-count').textContent = details ? '2 OF 2' : '1 OF 2';
+  document.querySelectorAll('.form-progress > span')[1].classList.toggle('active', details);
+  detailsPanel.querySelectorAll('[required]').forEach(input => { input.disabled = !details; });
+  if (details) {
+    const data = new FormData(form);
+    document.getElementById('requirements-summary').textContent = `${data.get('service')} · ${data.get('location').trim()}`;
+  }
+}
+function validateRequirements() {
+  for (const input of requirementsPanel.querySelectorAll('[required]')) {
+    if (input.type !== 'radio') input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value.');
+    if (!input.reportValidity()) return false;
+  }
+  return true;
+}
+showBriefStep(1);
+document.getElementById('form-next').addEventListener('click', () => {
+  if (!validateRequirements()) return;
+  showBriefStep(2);
+  document.getElementById('name').focus({ preventScroll: true });
+});
+for (const id of ['form-back', 'edit-requirements']) document.getElementById(id).addEventListener('click', () => {
+  showBriefStep(1);
+  document.getElementById('location').focus({ preventScroll: true });
+});
 let currentBrief = '';
-document.getElementById('brief-form').addEventListener('submit', event => {
+form.addEventListener('submit', event => {
   event.preventDefault();
-  const data = new FormData(event.currentTarget);
-  for (const input of event.currentTarget.querySelectorAll('[required]')) {
-    input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value.');
+  if (detailsPanel.hidden) {
+    if (validateRequirements()) { showBriefStep(2); document.getElementById('name').focus({ preventScroll: true }); }
+    return;
+  }
+  const data = new FormData(form);
+  for (const input of form.querySelectorAll('[required]')) {
+    if (input.type !== 'radio') input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value.');
     if (!input.reportValidity()) return;
   }
-  currentBrief = ['HORIZON RESPONSE SERVICES — SECURITY BRIEF', '', `Name: ${data.get('name').trim()}`, `Email: ${data.get('email').trim()}`, `Organisation: ${data.get('company').trim() || 'Not provided'}`, `Location: ${data.get('location').trim()}`, `Service: ${data.get('service')}`, '', 'Requirements:', data.get('message').trim(), '', 'Prepared in the Horizon Response website brief builder. No enquiry has been sent.'].join('\n');
+  currentBrief = ['HORIZON RESPONSE SERVICES — SECURITY BRIEF', '', `Name: ${data.get('name').trim()}`, `Email: ${data.get('email').trim()}`, `Organisation: ${data.get('company').trim() || 'Not provided'}`, `Phone: ${data.get('phone').trim() || 'Not provided'}`, `Location: ${data.get('location').trim()}`, `Service: ${data.get('service')}`, '', 'Requirements:', data.get('message').trim(), '', 'Prepared in the Horizon Response website brief builder. No enquiry has been sent.'].join('\n');
   document.getElementById('brief-preview').textContent = currentBrief;
   document.querySelector('.copy-status').textContent = '';
   openDialog(document.getElementById('brief-dialog'));
 });
-document.querySelectorAll('#brief-form [required]').forEach(input => input.addEventListener('input', () => input.setCustomValidity('')));
+form.querySelectorAll('[required]').forEach(input => input.addEventListener('input', () => input.setCustomValidity('')));
 document.getElementById('download-brief').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([currentBrief], {type: 'text/plain;charset=utf-8'}));
   const link = document.createElement('a'); link.href = url; link.download = 'horizon-response-security-brief.txt';

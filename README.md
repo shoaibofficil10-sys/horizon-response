@@ -1,6 +1,8 @@
 # Horizon Response
 
-A monochrome security services homepage built with Vite, locally hosted variable fonts, a metallic HR shield visual and custom security imagery. Includes an animated hero with pointer response and a pause control, an asymmetric bento introduction, six image-linked service panels, accessible dialogs, mobile navigation, reduced-motion support and a browser-only security brief builder.
+A minimalist, photographic security services homepage built with Vite and locally hosted variable fonts. Includes a custom security-officer hero, six image-led service cards, accessible service dialogs, mobile navigation, reduced-motion support, a two-step security brief builder and an aligned footer. The HR identity uses black, white and neutral greys.
+
+The brief builder guides visitors through service/site requirements and contact details, then creates a local downloadable or copyable brief. It does not submit an enquiry or persist personal data. A transparent PNG of the two hero security officers is available in `public/images/security-officers-transparent.png`.
 
 ## Development
 
@@ -35,6 +37,6 @@ Where Chromium is already installed, use `CHROMIUM_PATH=/usr/bin/chromium npm te
 - Confirm the public phone, email, actual service area and business/licensing information.
 - Connect an approved enquiry delivery service if enquiries should be submitted online. The current brief builder only prepares and downloads a local text file; it does not send enquiries or persist form data.
 - The canonical URL, sitemap, robots.txt, organisation data and social metadata currently use https://horizon-response2.vercel.app/. Update these together if a custom domain is connected.
-- Design references were reviewed visually in Chromium: Edenviews/Shahrukhz (cinematic imagery and elegant typography), World Wise (layered visuals, animated pathways, image-led services) and HUCO Digital (sculptural hero, moving ribbons, varied bento sections). Allied, GMR, JR Security and Sunstate were reviewed for security industry context.
+- Design preferences were researched visually in Chromium, then adapted into an original photographic layout: Edenviews/Shahrukhz (cinematic imagery and elegant typography), World Wise (layered visuals, animated pathways, image-led services) and HUCO Digital (sculptural hero, moving ribbons, varied bento sections). Allied, GMR, JR Security and Sunstate were reviewed for security industry context.
 
-The HR brand asset was prepared from the user-supplied logo reference; the metallic hero emblem is an illustrative 3D interpretation. Security photographs were generated for this design and do not depict verified Horizon Response staff or facilities. No credentials are required to build the homepage.
+The HR brand asset was prepared from the user-supplied logo reference. Security photographs were generated for this design and do not depict verified Horizon Response staff or facilities. No credentials are required to build the homepage.
