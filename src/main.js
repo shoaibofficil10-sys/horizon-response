@@ -9,6 +9,70 @@ const services = {
   afterhours: { title: 'After-Hours Security Services', description: 'Quiet hours can bring a different set of security concerns. Discuss an after-hours arrangement that reflects your premises, access requirements and the times when you need a visible presence.', points: ['Evening, overnight and weekend requirements', 'Vulnerable areas and site access points', 'Agreed observation and reporting procedures', 'Handover instructions and escalation contacts'] },
 };
 
+const serviceVisuals = {
+  static: { image: 'horizon-lobby.webp', alt: 'A security officer at a modern commercial reception', caption: 'A professional presence. A reassuring first impression.' },
+  construction: { image: 'horizon-construction.webp', alt: 'Security officer overseeing access at a construction site', caption: 'Keep your project moving in the right direction.' },
+  warehouse: { image: 'horizon-site.webp', alt: 'Modern warehouse and industrial facility at dusk', caption: 'Protection that works around your operations.' },
+  event: { image: 'horizon-event.webp', alt: 'Professional security officer welcoming guests to an evening event', caption: 'A safe environment. A better experience.' },
+  residential: { image: 'horizon-residential.webp', alt: 'Security officer and resident in a landscaped residential community', caption: 'A familiar presence. A community at ease.' },
+  afterhours: { image: 'horizon-hero.webp', alt: 'Security officer overlooking commercial premises at blue hour', caption: 'When the day ends, attention shouldn’t.' },
+};
+const serviceKeys = Object.keys(serviceVisuals);
+function selectService(key) {
+  document.querySelectorAll('.service-card').forEach(card => {
+    const active = card.dataset.panel === key;
+    card.classList.toggle('active', active);
+    card.querySelector('.service-tab').setAttribute('aria-expanded', String(active));
+    card.querySelector('.service-description').hidden = !active;
+  });
+  const visual = serviceVisuals[key];
+  const image = document.getElementById('service-image');
+  image.src = `/images/${visual.image}`;
+  image.alt = visual.alt;
+  document.getElementById('service-image-title').textContent = visual.caption;
+  document.getElementById('service-count').textContent = `0${serviceKeys.indexOf(key) + 1} / 06`;
+}
+document.querySelectorAll('[data-select-service]').forEach(button => button.addEventListener('click', () => selectService(button.dataset.selectService)));
+document.querySelectorAll('[data-environment]').forEach(link => link.addEventListener('click', () => selectService(link.dataset.environment)));
+
+const stage = document.querySelector('.hero-stage');
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+let motionPaused = motionPreference.matches;
+stage.addEventListener('pointermove', event => {
+  if (motionPaused || event.pointerType !== 'mouse') return;
+  const rect = stage.getBoundingClientRect();
+  stage.style.setProperty('--shield-ry', `${((event.clientX - rect.left) / rect.width - .5) * 12}deg`);
+  stage.style.setProperty('--shield-rx', `${((event.clientY - rect.top) / rect.height - .5) * -8}deg`);
+});
+stage.addEventListener('pointerleave', () => {
+  stage.style.setProperty('--shield-ry', '0deg');
+  stage.style.setProperty('--shield-rx', '0deg');
+});
+const motionButton = document.createElement('button');
+motionButton.className = 'motion-toggle';
+motionButton.textContent = 'II PAUSE MOTION';
+motionButton.setAttribute('aria-label', 'Pause decorative animations');
+motionButton.setAttribute('aria-pressed', 'false');
+motionButton.hidden = motionPreference.matches;
+stage.append(motionButton);
+motionButton.addEventListener('click', () => {
+  motionPaused = !motionPaused;
+  document.body.classList.toggle('motion-paused', motionPaused);
+  motionButton.textContent = motionPaused ? '> PLAY MOTION' : 'II PAUSE MOTION';
+  motionButton.setAttribute('aria-label', motionPaused ? 'Play decorative animations' : 'Pause decorative animations');
+  motionButton.setAttribute('aria-pressed', String(motionPaused));
+  if (motionPaused) stage.style.setProperty('--shield-ry', '0deg');
+  if (motionPaused) stage.style.setProperty('--shield-rx', '0deg');
+});
+motionPreference.addEventListener('change', event => {
+  motionPaused = event.matches;
+  motionButton.hidden = event.matches;
+  document.body.classList.remove('motion-paused');
+  motionButton.textContent = 'II PAUSE MOTION';
+  motionButton.setAttribute('aria-label', 'Pause decorative animations');
+  motionButton.setAttribute('aria-pressed', 'false');
+});
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 function closeMenu() {
@@ -77,7 +141,7 @@ document.getElementById('brief-form').addEventListener('submit', event => {
     input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value.');
     if (!input.reportValidity()) return;
   }
-  currentBrief = ['HORIZON RESPONSE — SECURITY BRIEF', '', `Name: ${data.get('name').trim()}`, `Email: ${data.get('email').trim()}`, `Organisation: ${data.get('company').trim() || 'Not provided'}`, `Location: ${data.get('location').trim()}`, `Service: ${data.get('service')}`, '', 'Requirements:', data.get('message').trim(), '', 'Prepared in the Horizon Response website brief builder. No enquiry has been sent.'].join('\n');
+  currentBrief = ['HORIZON RESPONSE SERVICES — SECURITY BRIEF', '', `Name: ${data.get('name').trim()}`, `Email: ${data.get('email').trim()}`, `Organisation: ${data.get('company').trim() || 'Not provided'}`, `Location: ${data.get('location').trim()}`, `Service: ${data.get('service')}`, '', 'Requirements:', data.get('message').trim(), '', 'Prepared in the Horizon Response website brief builder. No enquiry has been sent.'].join('\n');
   document.getElementById('brief-preview').textContent = currentBrief;
   document.querySelector('.copy-status').textContent = '';
   openDialog(document.getElementById('brief-dialog'));
@@ -102,8 +166,5 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: re
   const observer = new IntersectionObserver(entries => entries.forEach(entry => {
     if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
   }), { threshold: 0.08 });
-  document.querySelectorAll('.reveal').forEach((element, index) => {
-    if (element.classList.contains('service-card')) element.style.transitionDelay = `${index % 3 * 60}ms`;
-    observer.observe(element);
-  });
+  document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
 }

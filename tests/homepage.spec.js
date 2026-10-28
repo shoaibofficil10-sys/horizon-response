@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test('homepage serves its content, images and search metadata without browser errors', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
@@ -20,6 +21,9 @@ test('homepage serves its content, images and search metadata without browser er
 test('all six service panels open, select the right service and close accessibly', async ({ page }) => {
   await page.goto('/');
   for (const card of await page.locator('.service-card').all()) {
+    await card.locator('.service-tab').click();
+    await expect(card.locator('.service-tab')).toHaveAttribute('aria-expanded', 'true');
+    await expect.poll(() => page.locator('#service-image').evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
     await card.getByRole('button', { name: 'Explore service' }).click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
@@ -30,7 +34,8 @@ test('all six service panels open, select the right service and close accessibly
     await expect(page.locator('#service')).toHaveValue(title);
     await expect(page.locator('#name')).toBeFocused();
   }
-  await page.locator('.service-card').first().getByRole('button').click();
+  await page.locator('.service-card').first().locator('.service-tab').click();
+  await page.locator('.service-card').first().getByRole('button', { name: 'Explore service' }).click();
   await page.keyboard.press('Escape');
   await expect(page.locator('#service-dialog')).not.toBeVisible();
 });
@@ -111,4 +116,18 @@ test('homepage has no serious accessibility issues on desktop or mobile', async 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(results.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.map(n => n.target) }))).toEqual([]);
   }
+});
+
+test('decorative motion can be paused and environment cards select their matching service', async ({ page }) => {
+  await page.goto('/');
+  const control = page.locator('.motion-toggle');
+  await control.click();
+  await expect(control).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.locator('.strip-track').evaluate(el => getComputedStyle(el).animationPlayState)).toBe('paused');
+  await page.getByRole('button', { name: 'Play decorative animations' }).click();
+  await expect(control).toHaveAttribute('aria-pressed', 'false');
+  await page.locator('[data-environment="residential"]').click();
+  await expect(page.locator('[data-panel="residential"] .service-tab')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('#service-image')).toHaveAttribute('src', '/images/horizon-residential.webp');
+  await expect(page.locator('#service-count')).toHaveText('05 / 06');
 });
