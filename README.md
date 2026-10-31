@@ -88,3 +88,9 @@ The homepage's final form and Contact Us form now use one visible step. Name and
 The header opens a website keypad before handing off through an explicit `tel:` link. The currently displayed number, +61 491 570 006, is a temporary example reserved by ACMA for creative works (https://www.acma.gov.au/phone-numbers-use-tv-shows-films-and-creative-works). It is visibly labelled temporary and is not the business's live line. Replace the `data-security-phone` value, header text and temporary status in each static page when the real number is supplied.
 
 The homepage has a short Daytime / Evenings / After hours section with keyboard-accessible tabs and reduced-motion support. Mobile service cards now show two full cards per row, retaining balanced rows, hidden native scrollbars and access to full descriptions through their detail dialogs.
+
+## Locked phone dropdown and service-focused copy
+
+The header call action now reveals an anchored, non-modal phone-shaped dropdown with a smooth drop entrance. Its saved example number is read-only; the visual keypad is decorative and no digit-edit, clear or delete action is exposed. The call link always uses the configured saved number. Escape, click outside, close, focus containment and reduced motion are supported.
+
+The short homepage section now explains Horizon's three service groupings: site guarding; mobile patrols, alarm arrangements and after-hours security; and specialist security for events, residential communities, campuses and healthcare.

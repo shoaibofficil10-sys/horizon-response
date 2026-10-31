@@ -1,22 +1,27 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-test('header keypad supports digits, deletion and a user-controlled telephone handoff',async({page})=>{
- await page.goto('/');
- await page.getByRole('button',{name:'Open security phone keypad'}).click();
- const dialog=page.locator('#call-dialog');await expect(dialog).toBeVisible();
- await expect(page.locator('#dial-number')).toHaveValue('+61491570006');
- await expect(page.locator('#dial-status')).toContainText('Temporary example number');
- await page.locator('#dial-clear').click();
- await expect(page.locator('#dial-call')).toHaveAttribute('aria-disabled','true');
- for(const digit of '+61400111222') await page.locator(`[data-dial-key="${digit}"]`).click();
- await expect(page.locator('#dial-call')).toHaveAttribute('href','tel:+61400111222');
- await page.getByRole('button',{name:'Delete last digit'}).click();
- await expect(page.locator('#dial-number')).toHaveValue('+6140011122');
- const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
- expect(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
- await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
- await expect(page.getByRole('button',{name:'Open security phone keypad'})).toBeFocused();
+test('header phone drops beneath the header with a locked saved number and fixed call link',async({page})=>{
+ for(const width of [1440,390]) {
+  await page.setViewportSize({width,height:1000});await page.goto('/');
+  const trigger=page.getByRole('button',{name:'Open security phone keypad'});
+  await trigger.click();const panel=page.locator('#call-dialog');await expect(panel).toBeVisible();
+  await expect(trigger).toHaveAttribute('aria-expanded','true');
+  await panel.evaluate(e=>Promise.all(e.getAnimations().map(a=>a.finished)));
+  const bounds=await panel.boundingBox(),header=await page.locator('.site-header').boundingBox();
+  expect(bounds.y).toBeGreaterThanOrEqual(header.y+header.height);
+  expect(bounds.x).toBeGreaterThanOrEqual(0);expect(bounds.x+bounds.width).toBeLessThanOrEqual(width);
+  await expect(page.locator('#dial-number')).toHaveAttribute('readonly','');
+  await expect(page.locator('#dial-number')).toHaveValue('+61 491 570 006');
+  await page.locator('#dial-number').focus();await page.keyboard.type('123456');
+  await expect(page.locator('#dial-number')).toHaveValue('+61 491 570 006');
+  await expect(page.locator('#dial-call')).toHaveAttribute('href','tel:+61491570006');
+  await expect(page.locator('#dial-clear, #dial-delete, #dial-reset')).toHaveCount(0);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  expect(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
+  await page.keyboard.press('Escape');await expect(panel).not.toBeVisible();await expect(trigger).toBeFocused();
+ }
 });
 
 test('new short homepage section supports keyboard tab selection',async({page})=>{
@@ -27,7 +32,8 @@ test('new short homepage section supports keyboard tab selection',async({page})=
  await expect(page.locator('#day-panel-0')).not.toBeVisible();
  await page.keyboard.press('End');
  await expect(page.locator('#day-panel-2')).toBeVisible();
- await expect(page.locator('#day-panel-2 a')).toHaveAttribute('href',/After-Hours/);
+ await expect(page.locator('#day-panel-2 a')).toHaveAttribute('href','/#services');
+ await expect(page.locator('#day-panel-2')).toContainText('healthcare');
 });
 
 test('mobile shows two complete service cards per row without horizontal page overflow',async({page})=>{

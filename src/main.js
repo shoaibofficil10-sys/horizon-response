@@ -28,6 +28,7 @@ function closeMenu() {
   document.body.classList.remove('menu-open');
 }
 menuToggle.addEventListener('click', () => {
+  closeCallPanel();
   const open = menuToggle.getAttribute('aria-expanded') !== 'true';
   menuToggle.setAttribute('aria-expanded', String(open));
   menuToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
@@ -49,7 +50,7 @@ document.addEventListener('keydown', event => {
 matchMedia('(min-width: 701px)').addEventListener('change', event => { if (event.matches) closeMenu(); });
 
 const dialogs = [...document.querySelectorAll('dialog')];
-function openDialog(dialog) { dialog.showModal(); document.body.classList.add('modal-open'); }
+function openDialog(dialog) { closeCallPanel(); dialog.showModal(); document.body.classList.add('modal-open'); }
 dialogs.forEach(dialog => {
   dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => { if (!dialogs.some(d => d.open)) document.body.classList.remove('modal-open'); });
@@ -233,7 +234,7 @@ if (heroStage) {
     finally { incoming.remove(); controls.forEach(button => { button.disabled = false; }); heroChanging = false; }
   }
   setInterval(() => {
-    if (!paused && !document.hidden && !document.querySelector('.site-header.mega-open') && !document.body.classList.contains('menu-open') && !heroStage.closest('.immersive-hero').matches(':hover, :focus-within') && heroStage.getBoundingClientRect().bottom > 0 && !document.querySelector('dialog[open]')) showHero(active + 1);
+    if (!paused && !document.hidden && !document.querySelector('.site-header.mega-open, .site-header.call-open') && !document.body.classList.contains('menu-open') && !heroStage.closest('.immersive-hero').matches(':hover, :focus-within') && heroStage.getBoundingClientRect().bottom > 0 && !document.querySelector('dialog[open]')) showHero(active + 1);
   }, 8500);
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', event => { if(event.matches) { paused = true; syncPause(); } });
   document.getElementById('hero-prev').addEventListener('click', () => showHero(active - 1));
@@ -255,6 +256,7 @@ function closeMega(restoreFocus = false) {
   if (restoreFocus) lastMegaTrigger.focus({preventScroll:true});
 }
 function openMega(trigger) {
+  closeCallPanel();
   clearTimeout(megaHoverOpenTimer); clearTimeout(megaHoverCloseTimer);
   lastMegaTrigger = trigger; header.classList.add('mega-open'); megaPanel.inert = false;
   megaTriggers.forEach(item => item.setAttribute('aria-expanded', 'true'));
@@ -304,30 +306,48 @@ megaTriggers.forEach(trigger => {
 megaPanel.addEventListener('pointerenter', () => { clearTimeout(megaHoverOpenTimer); clearTimeout(megaHoverCloseTimer); });
 megaPanel.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse' && canHoverMega()) scheduleMegaClose(); });
 
-// The website keypad hands off to the device only after the user chooses Call.
+// Header-anchored phone disclosure. The saved number is display-only and cannot be edited.
 const callDialog = document.getElementById('call-dialog');
+const callTriggers = [...document.querySelectorAll('[data-open-call]')];
 const dialNumber = document.getElementById('dial-number');
 const dialCall = document.getElementById('dial-call');
 const savedSecurityNumber = callDialog.dataset.securityPhone;
-const normaliseDial = value => value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '').slice(0, 24);
-function updateDial(value) {
-  dialNumber.value = normaliseDial(value);
-  const valid = /^\+?\d{3,20}$/.test(dialNumber.value);
-  dialCall.setAttribute('aria-disabled', String(!valid));
-  if (valid) dialCall.href = `tel:${dialNumber.value}`;
-  else dialCall.removeAttribute('href');
+let lastCallTrigger = callTriggers[0];
+function positionCallPanel(trigger) {
+  const panelWidth = Math.min(304, innerWidth - 24);
+  const maxRight = Math.max(12, innerWidth - panelWidth - 12);
+  const desired = innerWidth - trigger.getBoundingClientRect().right;
+  callDialog.style.setProperty('--call-right', `${Math.min(Math.max(12, desired), maxRight)}px`);
 }
-document.querySelectorAll('[data-open-call]').forEach(button => button.addEventListener('click', () => {
-  closeMega(); closeMenu(); updateDial(savedSecurityNumber); openDialog(callDialog);
-}));
-document.querySelectorAll('[data-dial-key]').forEach(button => button.addEventListener('click', () => updateDial(dialNumber.value + button.dataset.dialKey)));
-document.getElementById('dial-delete').addEventListener('click', () => updateDial(dialNumber.value.slice(0, -1)));
-document.getElementById('dial-clear').addEventListener('click', () => updateDial(''));
-document.getElementById('dial-reset').addEventListener('click', () => updateDial(savedSecurityNumber));
-dialNumber.addEventListener('input', () => updateDial(dialNumber.value));
-dialCall.addEventListener('click', event => {
-  if (dialCall.getAttribute('aria-disabled') === 'true') { event.preventDefault(); dialNumber.focus(); }
+function closeCallPanel(restoreFocus = false) {
+  header.classList.remove('call-open'); callDialog.inert = true;
+  callTriggers.forEach(button => button.setAttribute('aria-expanded','false'));
+  if(restoreFocus) lastCallTrigger.focus({preventScroll:true});
+}
+function openCallPanel(trigger) {
+  closeMega(); closeMenu(); lastCallTrigger = trigger; positionCallPanel(trigger);
+  header.classList.add('call-open'); callDialog.inert = false;
+  callTriggers.forEach(button => button.setAttribute('aria-expanded','true'));
+  dialCall.href = `tel:${savedSecurityNumber}`;
+}
+callTriggers.forEach(button => button.addEventListener('click', () => header.classList.contains('call-open') ? closeCallPanel() : openCallPanel(button)));
+document.querySelector('.phone-close').addEventListener('click', () => closeCallPanel(true));
+document.querySelector('.call-backdrop').addEventListener('click', () => closeCallPanel());
+document.addEventListener('pointerdown', event => {
+  if(header.classList.contains('call-open') && !callDialog.contains(event.target) && !event.target.closest('[data-open-call]')) closeCallPanel();
 });
+document.addEventListener('keydown', event => {
+  if(!header.classList.contains('call-open')) return;
+  if(event.key === 'Escape') {event.preventDefault();event.stopImmediatePropagation();closeCallPanel(true);return;}
+  if(event.key === 'Tab') {
+    const items=[lastCallTrigger,...callDialog.querySelectorAll('button,input,a[href]')];
+    const first=items[0],last=items.at(-1);
+    if(!event.shiftKey && document.activeElement===first){event.preventDefault();items[1].focus();}
+    else if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
+    else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+  }
+},true);
+window.addEventListener('resize', () => {if(header.classList.contains('call-open')) positionCallPanel(lastCallTrigger);});
 
 const dayTabs = [...document.querySelectorAll('.day-tabs [role=tab]')];
 function chooseDay(index, focus = false) {
