@@ -68,3 +68,9 @@ Contact Us uses an open editorial layout with fine dividers, line icons and an u
 The masthead is 74px on desktop and 64px on mobile, with a left-aligned identity, centred desktop navigation and the existing accessible mega menu. All fixed-header offsets use the same CSS variable. Services retain their photographic background and inset white copy panels. Four cards occupy the first desktop row and the remaining cards occupy the second; additional groups can overflow horizontally, while native scrollbars remain hidden. Tablet and mobile retain two rows with touch scrolling and visible navigation controls.
 
 The copy panels now use an automatic flex basis, which prevents them collapsing when the cards have a fixed height. Shortened descriptions and responsive typography keep headings, body copy and service actions inside each panel without truncating the content.
+
+## Expanded security services
+
+The service selector is restored to the left of the two-row photographic gallery on desktop. The original ten service cards retain their inset text treatment; overflow uses the existing controls or native touch scrolling without visible scrollbars. The catalogue now includes Mobile Patrols, Alarm Services, Campus Security and Healthcare Security throughout cards, detail dialogs, mega menus, footers and both enquiry forms.
+
+Desktop mega menus also open on fine-pointer hover with a 140ms intent delay and a 260ms closing bridge. Click, keyboard and touch remain supported. Header navigation text is slightly larger while the compact header height is retained.

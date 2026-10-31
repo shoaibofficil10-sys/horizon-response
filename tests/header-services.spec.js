@@ -9,7 +9,9 @@ test('compact header and desktop services show four cards then a second row',asy
  expect(boxes[5].top).toBe(boxes[4].top);
  expect(Math.abs(boxes[4].left-boxes[0].left)).toBeLessThan(1);
  expect(await page.locator('.service-grid').evaluate(e=>getComputedStyle(e).scrollbarWidth)).toBe('none');
- expect(await page.locator('.service-grid').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+ expect(await page.locator('.service-grid').evaluate(e=>e.scrollWidth>e.clientWidth)).toBe(true);
+ const nav=await page.locator('.service-selector').boundingBox();
+ expect(nav.x+nav.width).toBeLessThan(boxes[0].left);
 });
 
 test('service text stays inside its inset panel and mobile rows scroll without a scrollbar',async({page})=>{

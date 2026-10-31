@@ -8,7 +8,7 @@ test('homepage serves its content, images and search metadata without browser er
   await page.goto('/');
   await expect(page).toHaveTitle(/Security Guard.*Australia/);
   await expect(page.locator('h1')).toHaveCount(1);
-  await expect(page.locator('.service-card')).toHaveCount(6);
+  await expect(page.locator('.service-card')).toHaveCount(10);
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /construction.*warehouse.*event/i);
   expect(await page.locator('script[type="application/ld+json"]').evaluate(el => JSON.parse(el.textContent)['@type'])).toBe('Organization');
   for (const image of await page.locator('main img').all()) {
@@ -18,7 +18,7 @@ test('homepage serves its content, images and search metadata without browser er
   expect(errors).toEqual([]);
 });
 
-test('all six service panels open, select the right service and close accessibly', async ({ page }) => {
+test('all ten service panels open, select the right service and close accessibly', async ({ page }) => {
   await page.goto('/');
   for (const card of await page.locator('.service-card').all()) {
     await card.getByRole('button', { name: 'Explore service' }).click();

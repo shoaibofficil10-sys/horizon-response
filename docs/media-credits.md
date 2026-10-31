@@ -25,3 +25,7 @@ The HR brand asset was prepared from the user-supplied logo reference. Supportin
 ## Current professional hero
 
 `public/images/security-professional-hero.webp` is an original AI-generated photographic-style illustration of two private security officers at a modern commercial entrance. It was created for the full-width hero refresh and converted to WebP at its original dimensions. It does not depict verified Horizon Response employees or a verified client site. The same illustrative status applies to the generated service gallery.
+
+## Additional specialist services
+
+`public/images/security-specialist-services.webp` is an original AI-generated four-scene illustration sheet for mobile patrols, alarm-service coordination, campus security and healthcare security. It was converted to WebP at the original dimensions. The people, vehicle and facilities are illustrative and are not verified employees, assets or client premises.

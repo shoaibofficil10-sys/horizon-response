@@ -7,6 +7,10 @@ const services = {
   event: { title: 'Event Security & Crowd Control', description: 'A safe, well-managed environment helps guests focus on the occasion. Event security planning begins with the venue, expected attendance and how people arrive, move and leave.', points: ['Entry points and guest access arrangements', 'Crowd flow and areas requiring attention', 'Coordination with venue staff and event organisers', 'Event timings, responsibilities and escalation plans'] },
   residential: { title: 'Residential Complex & Retirement Village Security', description: 'Communities need an approach that balances security with comfort and dignity. A respectful, approachable presence helps residents and visitors navigate shared spaces with greater confidence.', points: ['Community entrances and visitor arrangements', 'Shared spaces and perimeter considerations', 'Respectful interaction with residents and visitors', 'Agreed hours and communication with site management'] },
   afterhours: { title: 'After-Hours Security Services', description: 'Quiet hours can bring a different set of security concerns. Discuss an after-hours arrangement that reflects your premises, access requirements and the times when you need a visible presence.', points: ['Evening, overnight and weekend requirements', 'Vulnerable areas and site access points', 'Agreed observation and reporting procedures', 'Handover instructions and escalation contacts'] },
+  mobile: {"title": "Mobile Patrols", "description": "A visible patrol presence can support premises that do not need a permanent security post. Discuss your site, preferred visit times and what officers should observe, record and escalate.", "points": ["Premises, access points and external areas", "Preferred patrol windows and visit frequency", "Agreed observations, reporting and escalation", "Access instructions and coordination with management"]},
+  alarm: {"title": "Alarm Services", "description": "Alarm arrangements work best when responsibilities are clear. Discuss your existing system, who receives alerts and how a suitable response or escalation arrangement could fit your premises.", "points": ["Your existing alarm system and service provider", "Authorised access and nominated contacts", "Agreed alarm response and escalation requirements", "Scope, availability and provider responsibilities"]},
+  campus: {"title": "Campus Security", "description": "Education environments bring students, staff and visitors together throughout the day. Campus security planning should support a welcoming setting while considering access, shared facilities and after-hours activity.", "points": ["Campus entrances, visitor access and shared spaces", "Timetables, events and after-hours requirements", "Respectful interaction with students and staff", "Coordination with campus management and reporting"]},
+  healthcare: {"title": "Healthcare Security", "description": "Healthcare settings need a respectful, attentive approach to security. Planning should consider visitor movement, staff access, sensitive areas and clear coordination with the people managing the facility.", "points": ["Visitor guidance and staff access requirements", "Privacy, dignity and sensitive shared areas", "Agreed escalation and incident communication", "Site instructions and coordination with facility management"]},
 };
 
 const header = document.querySelector('.site-header');
@@ -285,12 +289,15 @@ if (heroStage) {
 const megaPanel = document.getElementById('services-mega');
 const megaTriggers = [...document.querySelectorAll('.mega-trigger')];
 let lastMegaTrigger = megaTriggers[0];
+let megaHoverOpenTimer, megaHoverCloseTimer;
 function closeMega(restoreFocus = false) {
+  clearTimeout(megaHoverOpenTimer); clearTimeout(megaHoverCloseTimer);
   header.classList.remove('mega-open'); megaPanel.inert = true;
   megaTriggers.forEach(trigger => trigger.setAttribute('aria-expanded', 'false'));
   if (restoreFocus) lastMegaTrigger.focus({preventScroll:true});
 }
 function openMega(trigger) {
+  clearTimeout(megaHoverOpenTimer); clearTimeout(megaHoverCloseTimer);
   lastMegaTrigger = trigger; header.classList.add('mega-open'); megaPanel.inert = false;
   megaTriggers.forEach(item => item.setAttribute('aria-expanded', 'true'));
 }
@@ -321,3 +328,20 @@ if (heroLeadForm) {
   alignHero();
   if ('ResizeObserver' in window) new ResizeObserver(alignHero).observe(heroLeadForm);
 }
+
+// Fine-pointer hover intent: a short entrance delay and a forgiving bridge to the panel.
+const canHoverMega = () => matchMedia('(hover: hover) and (min-width: 701px)').matches;
+const scheduleMegaClose = () => {
+  clearTimeout(megaHoverOpenTimer); clearTimeout(megaHoverCloseTimer);
+  megaHoverCloseTimer = setTimeout(() => { if (!megaPanel.matches(':focus-within')) closeMega(); }, 260);
+};
+megaTriggers.forEach(trigger => {
+  trigger.addEventListener('pointerenter', event => {
+    if (event.pointerType !== 'mouse' || !canHoverMega()) return;
+    clearTimeout(megaHoverCloseTimer); clearTimeout(megaHoverOpenTimer);
+    megaHoverOpenTimer = setTimeout(() => openMega(trigger), 140);
+  });
+  trigger.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse' && canHoverMega()) scheduleMegaClose(); });
+});
+megaPanel.addEventListener('pointerenter', () => { clearTimeout(megaHoverOpenTimer); clearTimeout(megaHoverCloseTimer); });
+megaPanel.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse' && canHoverMega()) scheduleMegaClose(); });
