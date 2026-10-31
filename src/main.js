@@ -30,6 +30,7 @@ menuToggle.addEventListener('click', () => {
   mobileNav.classList.toggle('open', open);
   mobileNav.inert = !open;
   document.body.classList.toggle('menu-open', open);
+  menuToggle.focus({ preventScroll: true });
 });
 mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
 document.addEventListener('keydown', event => {
@@ -168,3 +169,31 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: re
   }), { threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
 }
+
+// The gallery uses native scrolling, so all services remain reachable by touch and keyboard.
+const serviceGallery = document.querySelector('.service-grid');
+const galleryCards = [...serviceGallery.querySelectorAll('.service-card')];
+const galleryTabs = [...document.querySelectorAll('[data-service-slide]')];
+let galleryIndex = 0;
+let galleryManualScroll = false;
+function updateGallery(index) {
+  galleryIndex = Math.max(0, Math.min(galleryCards.length - 1, index));
+  galleryTabs.forEach((tab, i) => tab.setAttribute('aria-pressed', String(i === galleryIndex)));
+  document.getElementById('service-current').textContent = String(galleryIndex + 1).padStart(2, '0');
+  document.querySelector('.service-progress>span').style.width = `${(galleryIndex + 1) / galleryCards.length * 100}%`;
+}
+function showService(index) {
+  galleryManualScroll = false;
+  updateGallery(index);
+  serviceGallery.scrollTo({ left: galleryCards[galleryIndex].offsetLeft - galleryCards[0].offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+}
+galleryTabs.forEach((tab, i) => tab.addEventListener('click', () => showService(i)));
+document.getElementById('service-prev').addEventListener('click', () => showService((galleryIndex + galleryCards.length - 1) % galleryCards.length));
+document.getElementById('service-next').addEventListener('click', () => showService((galleryIndex + 1) % galleryCards.length));
+for (const event of ['pointerdown', 'wheel', 'keydown']) serviceGallery.addEventListener(event, () => { galleryManualScroll = true; }, { passive: true });
+serviceGallery.addEventListener('scroll', () => {
+  if (!galleryManualScroll) return;
+  const step = galleryCards[1].offsetLeft - galleryCards[0].offsetLeft;
+  const atEnd = Math.abs(serviceGallery.scrollWidth - serviceGallery.clientWidth - serviceGallery.scrollLeft) < 3;
+  if (step) updateGallery(atEnd ? galleryCards.length - 1 : Math.round(serviceGallery.scrollLeft / step));
+}, { passive: true });

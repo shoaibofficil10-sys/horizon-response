@@ -156,7 +156,7 @@ test('hero lead form validates details and carries them into the full enquiry br
   await page.getByLabel('Full name').fill('Jamie Example');
   await page.getByLabel('Work email').fill('jamie@example.com');
   await page.getByLabel('Phone number', { exact: true }).fill('0400 111 222');
-  await page.getByLabel('Security service', { exact: false }).selectOption('Warehouse & Industrial Security');
+  await page.getByRole('combobox', { name: 'Security service' }).selectOption('Warehouse & Industrial Security');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
   await expect(page.getByLabel('Site location')).toBeFocused();
   await expect(page.locator('input[name=service]:checked')).toHaveValue('Warehouse & Industrial Security');
@@ -170,4 +170,24 @@ test('hero lead form validates details and carries them into the full enquiry br
   await expect(page.locator('#brief-preview')).toContainText('Warehouse & Industrial Security');
   await expect(page.locator('#brief-preview')).toContainText('Jamie Example');
   expect(posts).toEqual([]);
+});
+
+
+test('service gallery selection, arrows and footer service details work', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.locator('[data-service-slide="3"]').click();
+  await expect(page.locator('[data-service-slide="3"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#service-current')).toHaveText('04');
+  await page.locator('#service-next').click();
+  await expect(page.locator('#service-current')).toHaveText('05');
+  await page.locator('#service-prev').click();
+  await expect(page.locator('#service-current')).toHaveText('04');
+  await page.locator('[data-service-slide="5"]').click();
+  await expect(page.locator('[data-service-slide="5"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('#service-afterhours .service-link').click();
+  await expect(page.locator('#dialog-title')).toHaveText('After-Hours Security Services');
+  await page.keyboard.press('Escape');
+  await page.locator('footer [data-service="event"]').click();
+  await expect(page.locator('#dialog-title')).toHaveText('Event Security & Crowd Control');
 });

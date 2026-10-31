@@ -17,3 +17,7 @@ This is illustrative stock photography. The person is not presented as a verifie
 ## Brand and supporting imagery
 
 The HR brand asset was prepared from the user-supplied logo reference. Supporting service illustrations and the earlier two-officer cutout were generated for the project. They are not verified photographs of company personnel or facilities.
+
+## Bright service gallery
+
+`public/images/security-services.webp` is an original, AI-generated six-scene image sheet created for the October 2026 homepage refresh. It illustrates commercial guarding, construction, warehouse, event, residential and after-hours security. The people and places are illustrative, not verified Horizon Response staff or facilities. The source PNG is retained in the workspace's generated image library; the website uses a WebP format conversion at the same dimensions. Individual scenes are framed in CSS.
