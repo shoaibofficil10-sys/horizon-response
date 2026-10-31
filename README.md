@@ -74,3 +74,7 @@ The copy panels now use an automatic flex basis, which prevents them collapsing 
 The service selector is restored to the left of the two-row photographic gallery on desktop. The original ten service cards retain their inset text treatment; overflow uses the existing controls or native touch scrolling without visible scrollbars. The catalogue now includes Mobile Patrols, Alarm Services, Campus Security and Healthcare Security throughout cards, detail dialogs, mega menus, footers and both enquiry forms.
 
 Desktop mega menus also open on fine-pointer hover with a 140ms intent delay and a 260ms closing bridge. Click, keyboard and touch remain supported. Header navigation text is slightly larger while the compact header height is retained.
+
+## Balanced service rows and compact navigation
+
+The ten service cards are split into two equal rows of five, with four columns visible on wide desktop layouts and matching horizontal overflow for both rows. Five category tabs replace the ten individual sidebar tabs. The footer shows four core service links and a link to the complete catalogue, while all four footer panels retain equal outer heights.

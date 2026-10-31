@@ -5,9 +5,9 @@ test('compact header and desktop services show four cards then a second row',asy
  expect((await page.locator('.site-header').boundingBox()).height).toBe(74);
  const boxes=await page.locator('.service-card').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {top:r.top,left:r.left,width:r.width,height:r.height};}));
  for(const box of boxes.slice(0,4)) expect(Math.abs(box.top-boxes[0].top)).toBeLessThan(1);
- expect(boxes[4].top).toBeGreaterThan(boxes[0].top+boxes[0].height);
- expect(boxes[5].top).toBe(boxes[4].top);
- expect(Math.abs(boxes[4].left-boxes[0].left)).toBeLessThan(1);
+ expect(boxes[5].top).toBeGreaterThan(boxes[0].top+boxes[0].height);
+ expect(boxes[9].top).toBe(boxes[5].top);
+ expect(Math.abs(boxes[5].left-boxes[0].left)).toBeLessThan(1);
  expect(await page.locator('.service-grid').evaluate(e=>getComputedStyle(e).scrollbarWidth)).toBe('none');
  expect(await page.locator('.service-grid').evaluate(e=>e.scrollWidth>e.clientWidth)).toBe(true);
  const nav=await page.locator('.service-selector').boundingBox();

@@ -17,8 +17,9 @@ test('all pages expose the four new services through menus, footer and enquiry c
  for(const route of ['/','/about/','/contact/']){
   await page.goto(route);
   await expect(page.locator('.mega-service')).toHaveCount(10);
-  await expect(page.locator('footer .footer-services>button')).toHaveCount(10);
-  for(const title of titles){await expect(page.locator('footer .footer-services')).toContainText(title);}
+  await expect(page.locator('footer .footer-services>button')).toHaveCount(4);
+  await expect(page.locator('footer .footer-all-services')).toHaveAttribute('href','/#services');
+  for(const title of titles){await expect(page.locator('.mega-services')).toContainText(title);}
   if(route!='/about/'){
    for(const title of titles) await expect(page.locator(`#brief-form input[value="${title}"]`)).toHaveCount(1);
   }

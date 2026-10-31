@@ -184,16 +184,17 @@ const serviceGallery = document.querySelector('.service-grid');
 if (serviceGallery) {
 const galleryCards = [...serviceGallery.querySelectorAll('.service-card')];
 const galleryTabs = [...document.querySelectorAll('[data-service-slide]')];
-// Four cards per row, then a second row. Further groups use native horizontal overflow.
+// Split the catalogue evenly between two rows, so both rows end together.
+const cardsPerRow = Math.ceil(galleryCards.length / 2);
 galleryCards.forEach((card, i) => {
-  card.style.gridColumn = String(Math.floor(i / 8) * 4 + i % 4 + 1);
-  card.style.gridRow = String(Math.floor(i / 4) % 2 + 1);
+  card.style.gridColumn = String(i % cardsPerRow + 1);
+  card.style.gridRow = String(Math.floor(i / cardsPerRow) + 1);
 });
 let galleryIndex = 0;
 let galleryManualScroll = false;
 function updateGallery(index) {
   galleryIndex = Math.max(0, Math.min(galleryCards.length - 1, index));
-  galleryTabs.forEach((tab, i) => tab.setAttribute('aria-pressed', String(i === galleryIndex)));
+  galleryTabs.forEach(tab => tab.setAttribute('aria-pressed', String(tab.dataset.serviceMembers.split(',').map(Number).includes(galleryIndex))));
   galleryCards.forEach((card, i) => card.classList.toggle('is-current', i === galleryIndex));
   document.getElementById('service-current').textContent = String(galleryIndex + 1).padStart(2, '0');
   document.querySelector('.service-progress>span').style.width = `${(galleryIndex + 1) / galleryCards.length * 100}%`;
@@ -203,7 +204,7 @@ function showService(index) {
   updateGallery(index);
   serviceGallery.scrollTo({ left: galleryCards[galleryIndex].offsetLeft - galleryCards[0].offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
 }
-galleryTabs.forEach((tab, i) => tab.addEventListener('click', () => showService(i)));
+galleryTabs.forEach(tab => tab.addEventListener('click', () => showService(Number(tab.dataset.serviceSlide))));
 document.getElementById('service-prev').addEventListener('click', () => showService((galleryIndex + galleryCards.length - 1) % galleryCards.length));
 document.getElementById('service-next').addEventListener('click', () => showService((galleryIndex + 1) % galleryCards.length));
 for (const event of ['pointerdown', 'wheel', 'keydown']) serviceGallery.addEventListener(event, () => { galleryManualScroll = true; }, { passive: true });
