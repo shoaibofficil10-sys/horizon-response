@@ -148,9 +148,9 @@ test('hero lead form validates details and carries them into the full enquiry br
   const posts = [];
   page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()); });
   await page.goto('/');
-  expect(await page.locator('.hero-photo').evaluate(img => getComputedStyle(img).objectFit)).toBe('contain');
-  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-event-real.webp');
-  await expect(page.locator('.photo-credit')).toHaveAttribute('href', /pexels.com.*34585117/);
+  expect(await page.locator('.hero-photo').evaluate(img => getComputedStyle(img).objectFit)).toBe('cover');
+  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-professional-hero.webp');
+  await expect(page.locator('.hero-signature')).toHaveText('PROFESSIONAL PRESENCE. PERSONAL APPROACH.');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
   await expect(page.getByLabel('Full name', { exact: false })).toBeFocused();
   await page.getByLabel('Full name').fill('Jamie Example');
