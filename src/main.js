@@ -180,11 +180,17 @@ const serviceGallery = document.querySelector('.service-grid');
 if (serviceGallery) {
 const galleryCards = [...serviceGallery.querySelectorAll('.service-card')];
 const galleryTabs = [...document.querySelectorAll('[data-service-slide]')];
+// Four cards per row, then a second row. Further groups use native horizontal overflow.
+galleryCards.forEach((card, i) => {
+  card.style.gridColumn = String(Math.floor(i / 8) * 4 + i % 4 + 1);
+  card.style.gridRow = String(Math.floor(i / 4) % 2 + 1);
+});
 let galleryIndex = 0;
 let galleryManualScroll = false;
 function updateGallery(index) {
   galleryIndex = Math.max(0, Math.min(galleryCards.length - 1, index));
   galleryTabs.forEach((tab, i) => tab.setAttribute('aria-pressed', String(i === galleryIndex)));
+  galleryCards.forEach((card, i) => card.classList.toggle('is-current', i === galleryIndex));
   document.getElementById('service-current').textContent = String(galleryIndex + 1).padStart(2, '0');
   document.querySelector('.service-progress>span').style.width = `${(galleryIndex + 1) / galleryCards.length * 100}%`;
 }
@@ -199,9 +205,13 @@ document.getElementById('service-next').addEventListener('click', () => showServ
 for (const event of ['pointerdown', 'wheel', 'keydown']) serviceGallery.addEventListener(event, () => { galleryManualScroll = true; }, { passive: true });
 serviceGallery.addEventListener('scroll', () => {
   if (!galleryManualScroll) return;
-  const step = galleryCards[1].offsetLeft - galleryCards[0].offsetLeft;
-  const atEnd = Math.abs(serviceGallery.scrollWidth - serviceGallery.clientWidth - serviceGallery.scrollLeft) < 3;
-  if (step) updateGallery(atEnd ? galleryCards.length - 1 : Math.round(serviceGallery.scrollLeft / step));
+  const origin = galleryCards[0].offsetLeft;
+  let nearest = 0, distance = Infinity;
+  galleryCards.forEach((card, i) => {
+    const gap = Math.abs(card.offsetLeft - origin - serviceGallery.scrollLeft);
+    if (gap < distance) { distance = gap; nearest = i; }
+  });
+  updateGallery(nearest);
 }, { passive: true });
 
 }

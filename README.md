@@ -62,3 +62,9 @@ The homepage visual slider fills the viewport and offers previous/next buttons a
 The shared services mega menu uses an accessible disclosure button, six service shortcuts, keyboard/Escape handling, a mobile overlay, animated entries and a soft backdrop. The hero crossfades decoded image layers, animates its copy gently and offers a pause/play control; automatic changes pause during hover, focus, open dialogs, navigation use or a hidden tab. Reduced-motion users get static transitions and paused autoplay by default.
 
 Contact Us uses an open editorial layout with fine dividers, line icons and an unboxed form. The left column and form align at both edges on desktop. A ResizeObserver aligns the hero copy with the hero enquiry form without fixed device-specific heights. The enquiry brief still stays in the browser; no sending endpoint or unconfirmed contact details have been introduced.
+
+## Compact header and service rows
+
+The masthead is 74px on desktop and 64px on mobile, with a left-aligned identity, centred desktop navigation and the existing accessible mega menu. All fixed-header offsets use the same CSS variable. Services retain their photographic background and inset white copy panels. Four cards occupy the first desktop row and the remaining cards occupy the second; additional groups can overflow horizontally, while native scrollbars remain hidden. Tablet and mobile retain two rows with touch scrolling and visible navigation controls.
+
+The copy panels now use an automatic flex basis, which prevents them collapsing when the cards have a fixed height. Shortened descriptions and responsive typography keep headings, body copy and service actions inside each panel without truncating the content.
