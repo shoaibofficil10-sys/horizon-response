@@ -82,3 +82,9 @@ The ten service cards are split into two equal rows of five, with four columns v
 ## Compact main enquiry forms
 
 The homepage's final form and Contact Us form now use one visible step. Name and phone appear first, followed by email, organisation, a compact native service dropdown, site location and requirements. Name, phone, email, service, location and requirements are required; the download/copy flow remains browser-local. Existing hero and service-detail shortcuts preserve and preselect the same fields.
+
+## Phone keypad, daily focus and mobile cards
+
+The header opens a website keypad before handing off through an explicit `tel:` link. The currently displayed number, +61 491 570 006, is a temporary example reserved by ACMA for creative works (https://www.acma.gov.au/phone-numbers-use-tv-shows-films-and-creative-works). It is visibly labelled temporary and is not the business's live line. Replace the `data-security-phone` value, header text and temporary status in each static page when the real number is supplied.
+
+The homepage has a short Daytime / Evenings / After hours section with keyboard-accessible tabs and reduced-motion support. Mobile service cards now show two full cards per row, retaining balanced rows, hidden native scrollbars and access to full descriptions through their detail dialogs.

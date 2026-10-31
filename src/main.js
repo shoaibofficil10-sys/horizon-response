@@ -303,3 +303,50 @@ megaTriggers.forEach(trigger => {
 });
 megaPanel.addEventListener('pointerenter', () => { clearTimeout(megaHoverOpenTimer); clearTimeout(megaHoverCloseTimer); });
 megaPanel.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse' && canHoverMega()) scheduleMegaClose(); });
+
+// The website keypad hands off to the device only after the user chooses Call.
+const callDialog = document.getElementById('call-dialog');
+const dialNumber = document.getElementById('dial-number');
+const dialCall = document.getElementById('dial-call');
+const savedSecurityNumber = callDialog.dataset.securityPhone;
+const normaliseDial = value => value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '').slice(0, 24);
+function updateDial(value) {
+  dialNumber.value = normaliseDial(value);
+  const valid = /^\+?\d{3,20}$/.test(dialNumber.value);
+  dialCall.setAttribute('aria-disabled', String(!valid));
+  if (valid) dialCall.href = `tel:${dialNumber.value}`;
+  else dialCall.removeAttribute('href');
+}
+document.querySelectorAll('[data-open-call]').forEach(button => button.addEventListener('click', () => {
+  closeMega(); closeMenu(); updateDial(savedSecurityNumber); openDialog(callDialog);
+}));
+document.querySelectorAll('[data-dial-key]').forEach(button => button.addEventListener('click', () => updateDial(dialNumber.value + button.dataset.dialKey)));
+document.getElementById('dial-delete').addEventListener('click', () => updateDial(dialNumber.value.slice(0, -1)));
+document.getElementById('dial-clear').addEventListener('click', () => updateDial(''));
+document.getElementById('dial-reset').addEventListener('click', () => updateDial(savedSecurityNumber));
+dialNumber.addEventListener('input', () => updateDial(dialNumber.value));
+dialCall.addEventListener('click', event => {
+  if (dialCall.getAttribute('aria-disabled') === 'true') { event.preventDefault(); dialNumber.focus(); }
+});
+
+const dayTabs = [...document.querySelectorAll('.day-tabs [role=tab]')];
+function chooseDay(index, focus = false) {
+  dayTabs.forEach((tab, i) => {
+    tab.setAttribute('aria-selected', String(i === index)); tab.tabIndex = i === index ? 0 : -1;
+    const panel = document.getElementById(tab.getAttribute('aria-controls'));
+    panel.hidden = i !== index;
+    if (i === index && !matchMedia('(prefers-reduced-motion: reduce)').matches) panel.animate([{opacity:0,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}], {duration:450,easing:'cubic-bezier(.2,.7,.2,1)'});
+  });
+  if(focus) dayTabs[index].focus();
+}
+dayTabs.forEach((tab,i) => {
+  tab.addEventListener('click', () => chooseDay(i));
+  tab.addEventListener('keydown', event => {
+    let index;
+    if(event.key === 'ArrowRight') index = (i + 1) % dayTabs.length;
+    if(event.key === 'ArrowLeft') index = (i + dayTabs.length - 1) % dayTabs.length;
+    if(event.key === 'Home') index = 0;
+    if(event.key === 'End') index = dayTabs.length - 1;
+    if(index !== undefined) {event.preventDefault();chooseDay(index,true);}
+  });
+});
