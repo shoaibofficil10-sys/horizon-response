@@ -50,3 +50,9 @@ The HR brand asset was prepared from the user-supplied logo reference. Secondary
 The services gallery adapts the selector, tall imagery and inset text panels reviewed at https://hucoskills.com/world-wise/. All six services remain reachable by selector buttons, previous/next controls, native scrolling and keyboard navigation. Colour imagery also replaces the monochrome supporting image.
 
 The footer adapts the invitation and four rounded panels reviewed at https://hucoskills.com/we-serve-website/ into a dark navy and muted green palette. Its calls to action lead into the existing security brief builder; no unverified phone, address or social profiles are added. The current HR identity, compact lead form and two-step brief builder are preserved.
+
+## Pages and navigation
+
+Vite builds three static entry points: `/`, `/about/` and `/contact/`. All pages share the same navigation, footer, service dialogs and privacy information. The About page explains the people-first approach without unsupported business-history or accreditation claims. The Contact page reuses the complete two-step, browser-local enquiry brief; no public phone, email or service area is displayed pending business confirmation.
+
+The homepage visual slider fills the viewport and offers previous/next buttons and touch swipes. On mobile the enquiry form follows the full-screen slider. Service cards retain the tall image and inset white panel design, with reduced text padding and no forced content height. Each page has a unique title, description and canonical URL; AboutPage/ContactPage structured data and the sitemap cover the new routes.

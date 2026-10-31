@@ -68,6 +68,7 @@ document.querySelectorAll('[data-service]').forEach(button => button.addEventLis
   openDialog(serviceDialog);
 }));
 document.getElementById('dialog-enquire').addEventListener('click', () => {
+  if (!document.getElementById('brief-form')) { location.href = '/contact/?service=' + encodeURIComponent(selectedService); return; }
   const input = [...document.querySelectorAll('input[name=service]')].find(input => input.value === selectedService);
   if (input) input.checked = true;
   showBriefStep(1);
@@ -80,6 +81,7 @@ const form = document.getElementById('brief-form');
 const requirementsPanel = document.getElementById('requirements-panel');
 const detailsPanel = document.getElementById('details-panel');
 function showBriefStep(step) {
+  if (!form) return;
   const details = step === 2;
   requirementsPanel.hidden = details;
   detailsPanel.hidden = !details;
@@ -102,17 +104,17 @@ function validateRequirements() {
   return true;
 }
 showBriefStep(1);
-document.getElementById('form-next').addEventListener('click', () => {
+document.getElementById('form-next')?.addEventListener('click', () => {
   if (!validateRequirements()) return;
   showBriefStep(2);
   document.getElementById('name').focus({ preventScroll: true });
 });
-for (const id of ['form-back', 'edit-requirements']) document.getElementById(id).addEventListener('click', () => {
+for (const id of ['form-back', 'edit-requirements']) document.getElementById(id)?.addEventListener('click', () => {
   showBriefStep(1);
   document.getElementById('location').focus({ preventScroll: true });
 });
 let currentBrief = '';
-form.addEventListener('submit', event => {
+form?.addEventListener('submit', event => {
   event.preventDefault();
   if (detailsPanel.hidden) {
     if (validateRequirements()) { showBriefStep(2); document.getElementById('name').focus({ preventScroll: true }); }
@@ -128,9 +130,9 @@ form.addEventListener('submit', event => {
   document.querySelector('.copy-status').textContent = '';
   openDialog(document.getElementById('brief-dialog'));
 });
-form.querySelectorAll('[required]').forEach(input => input.addEventListener('input', () => input.setCustomValidity('')));
+form?.querySelectorAll('[required]').forEach(input => input.addEventListener('input', () => input.setCustomValidity('')));
 const heroLeadForm = document.getElementById('hero-lead-form');
-heroLeadForm.addEventListener('submit', event => {
+heroLeadForm?.addEventListener('submit', event => {
   event.preventDefault();
   for (const field of heroLeadForm.querySelectorAll('[required]')) {
     field.setCustomValidity(field.value.trim() ? '' : 'Please enter a value.');
@@ -146,7 +148,7 @@ heroLeadForm.addEventListener('submit', event => {
   document.getElementById('contact').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   document.getElementById('location').focus({ preventScroll: true });
 });
-heroLeadForm.querySelectorAll('[required]').forEach(field => field.addEventListener('input', () => field.setCustomValidity('')));
+heroLeadForm?.querySelectorAll('[required]').forEach(field => field.addEventListener('input', () => field.setCustomValidity('')));
 
 document.getElementById('download-brief').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([currentBrief], {type: 'text/plain;charset=utf-8'}));
@@ -172,6 +174,7 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: re
 
 // The gallery uses native scrolling, so all services remain reachable by touch and keyboard.
 const serviceGallery = document.querySelector('.service-grid');
+if (serviceGallery) {
 const galleryCards = [...serviceGallery.querySelectorAll('.service-card')];
 const galleryTabs = [...document.querySelectorAll('[data-service-slide]')];
 let galleryIndex = 0;
@@ -197,3 +200,34 @@ serviceGallery.addEventListener('scroll', () => {
   const atEnd = Math.abs(serviceGallery.scrollWidth - serviceGallery.clientWidth - serviceGallery.scrollLeft) < 3;
   if (step) updateGallery(atEnd ? galleryCards.length - 1 : Math.round(serviceGallery.scrollLeft / step));
 }, { passive: true });
+
+}
+
+// Contact links from service dialogs preselect the chosen requirement.
+if (form) {
+  const requested = new URLSearchParams(location.search).get('service');
+  const choice = [...form.querySelectorAll('input[name=service]')].find(input => input.value === requested);
+  if (choice) choice.checked = true;
+}
+const heroStage = document.querySelector('.hero-stage');
+if (heroStage) {
+  const slides = [
+    { image: '/images/security-professional-hero.webp', alt: 'Two professional security officers at a landscaped modern commercial entrance', title: 'Confidence.<br>Where it matters.', copy: 'For the places you work. The communities you call home. And the moments that bring people together.', signature: 'PROFESSIONAL PRESENCE. PERSONAL APPROACH.' },
+    { image: '/images/security-event-real.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Every gathering.<br>A safer experience.', copy: 'An approachable presence. Clear coordination. Event security considered around your venue, your guests and your plans.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
+  ];
+  let active = 0;
+  function showHero(index) {
+    active = (index + slides.length) % slides.length;
+    const slide = slides[active], image = heroStage.querySelector('.hero-photo');
+    image.src = slide.image; image.alt = slide.alt;
+    heroStage.querySelector('h1').innerHTML = slide.title;
+    heroStage.querySelector('.hero-inner>p').textContent = slide.copy;
+    heroStage.querySelector('.hero-signature').textContent = slide.signature;
+    document.getElementById('hero-slide-count').textContent = `${String(active + 1).padStart(2, '0')} / 02`;
+  }
+  document.getElementById('hero-prev').addEventListener('click', () => showHero(active - 1));
+  document.getElementById('hero-next').addEventListener('click', () => showHero(active + 1));
+  let touchStart = 0;
+  heroStage.addEventListener('touchstart', event => { touchStart = event.changedTouches[0].clientX; }, { passive: true });
+  heroStage.addEventListener('touchend', event => { const delta = event.changedTouches[0].clientX - touchStart; if (Math.abs(delta) > 70) showHero(active + (delta < 0 ? 1 : -1)); }, { passive: true });
+}
