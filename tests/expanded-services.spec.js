@@ -9,7 +9,7 @@ test('desktop mega menu opens on hover and stays open while entering its panel',
  await page.locator('.mega-service[data-service="campus"]').click();
  await expect(page.locator('#dialog-title')).toHaveText('Campus Security');
  await page.getByRole('button',{name:'Include in my brief'}).click();
- await expect(page.locator('input[name=service]:checked')).toHaveValue('Campus Security');
+ await expect(page.locator('#service')).toHaveValue('Campus Security');
 });
 
 test('all pages expose the four new services through menus, footer and enquiry choices',async({page})=>{
@@ -21,7 +21,7 @@ test('all pages expose the four new services through menus, footer and enquiry c
   await expect(page.locator('footer .footer-all-services')).toHaveAttribute('href','/#services');
   for(const title of titles){await expect(page.locator('.mega-services')).toContainText(title);}
   if(route!='/about/'){
-   for(const title of titles) await expect(page.locator(`#brief-form input[value="${title}"]`)).toHaveCount(1);
+   for(const title of titles) await expect(page.locator("#brief-form select")).toContainText(title);
   }
  }
  await page.goto('/');
@@ -29,6 +29,6 @@ test('all pages expose the four new services through menus, footer and enquiry c
   await page.locator(`#service-${key} .service-link`).click();
   await expect(page.locator('#dialog-title')).toHaveText(title);
   await page.getByRole('button',{name:'Include in my brief'}).click();
-  await expect(page.locator('input[name=service]:checked')).toHaveValue(title);
+  await expect(page.locator('#service')).toHaveValue(title);
  }
 });

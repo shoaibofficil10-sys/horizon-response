@@ -28,7 +28,7 @@ test('all ten service panels open, select the right service and close accessibly
     await expect(dialog.locator('li')).toHaveCount(4);
     await dialog.getByRole('button', { name: 'Include in my brief' }).click();
     await expect(dialog).not.toBeVisible();
-    await expect(page.locator('input[name=service]:checked')).toHaveValue(title);
+    await expect(page.locator('#service')).toHaveValue(title);
     await expect(page.locator('#location')).toBeFocused();
   }
   await page.locator('.service-card').first().getByRole('button', { name: 'Explore service' }).click();
@@ -40,13 +40,11 @@ test('brief builder validates fields and downloads the user’s actual requireme
   const submissions = [];
   page.on('request', request => { if (request.method() === 'POST') submissions.push(request.url()); });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Continue to your details' }).click();
-  await expect(page.locator('#details-panel')).not.toBeVisible();
-  await page.getByRole('radio', { name: 'Construction sites', exact: true }).check();
+
+  await page.locator('#service').selectOption('Construction Site Security');
   await page.getByLabel('Site location').fill('Brisbane, QLD');
   await page.getByLabel('What do you have in mind?').fill('Overnight construction site presence for a two-week project.');
-  await page.getByRole('button', { name: 'Continue to your details' }).click();
-  await expect(page.locator('#details-panel')).toBeVisible();
+
   await page.getByRole('button', { name: 'Prepare my security brief' }).click();
   await expect(page.locator('#brief-dialog')).not.toBeVisible();
   await page.getByLabel('Your name').fill('Alex Example');
@@ -117,32 +115,28 @@ test('homepage has no serious accessibility issues on desktop or mobile', async 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(results.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.map(n => n.target) }))).toEqual([]);
-    await page.getByRole('radio', { name: 'Static guards', exact: true }).check();
+    await page.locator('#service').selectOption('Static Security Guards');
     await page.getByLabel('Site location').fill('Melbourne, VIC');
     await page.getByLabel('What do you have in mind?').fill('Weekday reception presence.');
-    await page.getByRole('button', { name: 'Continue to your details' }).click();
+
     const detailsResults = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(detailsResults.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([]);
   }
 });
 
-test('two-step brief preserves entries when requirements are edited', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('radio', { name: 'Static guards', exact: true }).check();
-  await page.getByLabel('Site location').fill('Sydney, NSW');
-  await page.getByLabel('What do you have in mind?').fill('Entry point coverage during business hours.');
-  await page.getByRole('button', { name: 'Continue to your details' }).click();
-  await expect(page.locator('#requirements-summary')).toContainText('Static Security Guards');
-  await page.getByLabel('Your name').fill('Sam Example');
-  await page.getByRole('button', { name: 'Edit requirements' }).click();
-  await expect(page.getByLabel('Site location')).toHaveValue('Sydney, NSW');
-  await page.getByRole('radio', { name: 'Events & crowd control', exact: true }).check();
-  await page.getByRole('button', { name: 'Continue to your details' }).click();
-  await expect(page.locator('#requirements-summary')).toContainText('Event Security & Crowd Control');
-  await expect(page.getByLabel('Your name')).toHaveValue('Sam Example');
-  await page.getByRole('button', { name: 'Back', exact: true }).click();
-  await expect(page.locator('#requirements-panel')).toBeVisible();
-  await expect(page.locator('input[name=service]:checked')).toHaveValue('Event Security & Crowd Control');
+test('main form shows name and phone immediately and preserves entries when services change', async ({page}) => {
+  for(const route of ['/','/contact/']) {
+    await page.goto(route);
+    await expect(page.locator('#name')).toBeVisible();
+    await expect(page.locator('#phone')).toBeVisible();
+    expect(await page.locator('#service').evaluate(e=>e.getBoundingClientRect().height)).toBeLessThan(60);
+    await page.locator('#name').fill('Sam Example');
+    await page.locator('#phone').fill('0400 123 456');
+    await page.locator('#service').selectOption('Static Security Guards');
+    await page.locator('#service').selectOption('Event Security & Crowd Control');
+    await expect(page.locator('#name')).toHaveValue('Sam Example');
+    await expect(page.locator('#phone')).toHaveValue('0400 123 456');
+  }
 });
 
 test('hero lead form validates details and carries them into the full enquiry brief', async ({ page }) => {
@@ -160,10 +154,10 @@ test('hero lead form validates details and carries them into the full enquiry br
   await page.getByRole('combobox', { name: 'Security service' }).selectOption('Warehouse & Industrial Security');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
   await expect(page.getByLabel('Site location')).toBeFocused();
-  await expect(page.locator('input[name=service]:checked')).toHaveValue('Warehouse & Industrial Security');
+  await expect(page.locator('#service')).toHaveValue('Warehouse & Industrial Security');
   await page.getByLabel('Site location').fill('Perth, WA');
   await page.getByLabel('What do you have in mind?').fill('Warehouse entry and visitor management.');
-  await page.getByRole('button', { name: 'Continue to your details' }).click();
+
   await expect(page.getByLabel('Your name')).toHaveValue('Jamie Example');
   await expect(page.getByLabel('Email address')).toHaveValue('jamie@example.com');
   await expect(page.getByLabel('Phone / mobile')).toHaveValue('0400 111 222');

@@ -15,7 +15,7 @@ test('desktop mega menu opens by keyboard, closes with Escape and opens the sele
  await expect(page.locator('#dialog-title')).toHaveText('Event Security & Crowd Control');
  await expect(trigger).toHaveAttribute('aria-expanded','false');
  await page.getByRole('button',{name:'Include in my brief'}).click();
- await expect(page.locator('input[name=service]:checked')).toHaveValue('Event Security & Crowd Control');
+ await expect(page.locator('#service')).toHaveValue('Event Security & Crowd Control');
 });
 
 test('mobile mega menu fits, contains focus and returns to the navigation',async({page})=>{

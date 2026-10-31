@@ -74,63 +74,22 @@ document.querySelectorAll('[data-service]').forEach(button => button.addEventLis
 }));
 document.getElementById('dialog-enquire').addEventListener('click', () => {
   if (!document.getElementById('brief-form')) { location.href = '/contact/?service=' + encodeURIComponent(selectedService); return; }
-  const input = [...document.querySelectorAll('input[name=service]')].find(input => input.value === selectedService);
-  if (input) input.checked = true;
-  showBriefStep(1);
+  document.getElementById('service').value = selectedService;
   serviceDialog.close();
   document.getElementById('contact').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   document.getElementById('location').focus({ preventScroll: true });
 });
 
 const form = document.getElementById('brief-form');
-const requirementsPanel = document.getElementById('requirements-panel');
-const detailsPanel = document.getElementById('details-panel');
-function showBriefStep(step) {
-  if (!form) return;
-  const details = step === 2;
-  requirementsPanel.hidden = details;
-  detailsPanel.hidden = !details;
-  document.getElementById('form-step-number').textContent = details ? '02' : '01';
-  document.getElementById('form-step-caption').textContent = details ? 'YOUR DETAILS' : 'YOUR REQUIREMENTS';
-  document.getElementById('form-step-title').textContent = details ? 'Who should the brief be prepared for?' : 'A little about your security needs.';
-  document.getElementById('form-step-count').textContent = details ? '2 OF 2' : '1 OF 2';
-  document.querySelectorAll('.form-progress > span')[1].classList.toggle('active', details);
-  detailsPanel.querySelectorAll('[required]').forEach(input => { input.disabled = !details; });
-  if (details) {
-    const data = new FormData(form);
-    document.getElementById('requirements-summary').textContent = `${data.get('service')} · ${data.get('location').trim()}`;
-  }
-}
-function validateRequirements() {
-  for (const input of requirementsPanel.querySelectorAll('[required]')) {
-    if (input.type !== 'radio') input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value.');
-    if (!input.reportValidity()) return false;
-  }
-  return true;
-}
-showBriefStep(1);
-document.getElementById('form-next')?.addEventListener('click', () => {
-  if (!validateRequirements()) return;
-  showBriefStep(2);
-  document.getElementById('name').focus({ preventScroll: true });
-});
-for (const id of ['form-back', 'edit-requirements']) document.getElementById(id)?.addEventListener('click', () => {
-  showBriefStep(1);
-  document.getElementById('location').focus({ preventScroll: true });
-});
 let currentBrief = '';
 form?.addEventListener('submit', event => {
   event.preventDefault();
-  if (detailsPanel.hidden) {
-    if (validateRequirements()) { showBriefStep(2); document.getElementById('name').focus({ preventScroll: true }); }
-    return;
-  }
-  const data = new FormData(form);
   for (const input of form.querySelectorAll('[required]')) {
-    if (input.type !== 'radio') input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value.');
+    input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value.');
     if (!input.reportValidity()) return;
   }
-  currentBrief = ['HORIZON RESPONSE SERVICES — SECURITY BRIEF', '', `Name: ${data.get('name').trim()}`, `Email: ${data.get('email').trim()}`, `Organisation: ${data.get('company').trim() || 'Not provided'}`, `Phone: ${data.get('phone').trim() || 'Not provided'}`, `Location: ${data.get('location').trim()}`, `Service: ${data.get('service')}`, '', 'Requirements:', data.get('message').trim(), '', 'Prepared in the Horizon Response website brief builder. No enquiry has been sent.'].join('\n');
+  const data = new FormData(form);
+  currentBrief = ['HORIZON RESPONSE SERVICES — SECURITY BRIEF', '', `Name: ${data.get('name').trim()}`, `Email: ${data.get('email').trim()}`, `Organisation: ${data.get('company').trim() || 'Not provided'}`, `Phone: ${data.get('phone').trim()}`, `Location: ${data.get('location').trim()}`, `Service: ${data.get('service')}`, '', 'Requirements:', data.get('message').trim(), '', 'Prepared in the Horizon Response website brief builder. No enquiry has been sent.'].join('\n');
   document.getElementById('brief-preview').textContent = currentBrief;
   document.querySelector('.copy-status').textContent = '';
   openDialog(document.getElementById('brief-dialog'));
@@ -147,9 +106,7 @@ heroLeadForm?.addEventListener('submit', event => {
   document.getElementById('name').value = data.get('name').trim();
   document.getElementById('email').value = data.get('email').trim();
   document.getElementById('phone').value = data.get('phone').trim();
-  const service = [...form.querySelectorAll('input[name=service]')].find(input => input.value === data.get('service'));
-  if (service) service.checked = true;
-  showBriefStep(1);
+  document.getElementById('service').value = data.get('service');
   document.getElementById('contact').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   document.getElementById('location').focus({ preventScroll: true });
 });
@@ -224,8 +181,8 @@ serviceGallery.addEventListener('scroll', () => {
 // Contact links from service dialogs preselect the chosen requirement.
 if (form) {
   const requested = new URLSearchParams(location.search).get('service');
-  const choice = [...form.querySelectorAll('input[name=service]')].find(input => input.value === requested);
-  if (choice) choice.checked = true;
+  const choice = form.elements.namedItem('service');
+  if ([...choice.options].some(option => option.value === requested)) choice.value = requested;
 }
 const heroStage = document.querySelector('.hero-stage');
 if (heroStage) {

@@ -78,3 +78,7 @@ Desktop mega menus also open on fine-pointer hover with a 140ms intent delay and
 ## Balanced service rows and compact navigation
 
 The ten service cards are split into two equal rows of five, with four columns visible on wide desktop layouts and matching horizontal overflow for both rows. Five category tabs replace the ten individual sidebar tabs. The footer shows four core service links and a link to the complete catalogue, while all four footer panels retain equal outer heights.
+
+## Compact main enquiry forms
+
+The homepage's final form and Contact Us form now use one visible step. Name and phone appear first, followed by email, organisation, a compact native service dropdown, site location and requirements. Name, phone, email, service, location and requirements are required; the download/copy flow remains browser-local. Existing hero and service-detail shortcuts preserve and preselect the same fields.
