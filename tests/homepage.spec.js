@@ -81,7 +81,8 @@ test('mobile navigation supports links, Escape, and focus containment', async ({
   await page.keyboard.press('Escape');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await toggle.click();
-  await page.locator('#mobile-nav').getByRole('link', { name: 'Security services' }).click();
+  await page.locator('#mobile-nav').getByRole('button', { name: 'Security services' }).click();
+  await page.locator('.mega-intro').getByRole('link', { name: 'Explore our services' }).click();
   await expect(page).toHaveURL(/#services$/);
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(page.locator('body')).not.toHaveClass(/menu-open/);

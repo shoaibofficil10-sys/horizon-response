@@ -22,6 +22,7 @@ test('hero slideshow fills the viewport and service text remains inset and compa
 });
 
 test('About and Contact pages have unique metadata, working navigation and no browser errors', async ({page}) => {
+  await page.emulateMedia({reducedMotion:'reduce'});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   for(const [route,title,type] of [['/about/','About Us','AboutPage'],['/contact/','Contact Us','ContactPage']]) {
     const response=await page.goto(route);

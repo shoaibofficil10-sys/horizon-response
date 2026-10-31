@@ -56,3 +56,9 @@ The footer adapts the invitation and four rounded panels reviewed at https://huc
 Vite builds three static entry points: `/`, `/about/` and `/contact/`. All pages share the same navigation, footer, service dialogs and privacy information. The About page explains the people-first approach without unsupported business-history or accreditation claims. The Contact page reuses the complete two-step, browser-local enquiry brief; no public phone, email or service area is displayed pending business confirmation.
 
 The homepage visual slider fills the viewport and offers previous/next buttons and touch swipes. On mobile the enquiry form follows the full-screen slider. Service cards retain the tall image and inset white panel design, with reduced text padding and no forced content height. Each page has a unique title, description and canonical URL; AboutPage/ContactPage structured data and the sitemap cover the new routes.
+
+## Interaction and contact polish
+
+The shared services mega menu uses an accessible disclosure button, six service shortcuts, keyboard/Escape handling, a mobile overlay, animated entries and a soft backdrop. The hero crossfades decoded image layers, animates its copy gently and offers a pause/play control; automatic changes pause during hover, focus, open dialogs, navigation use or a hidden tab. Reduced-motion users get static transitions and paused autoplay by default.
+
+Contact Us uses an open editorial layout with fine dividers, line icons and an unboxed form. The left column and form align at both edges on desktop. A ResizeObserver aligns the hero copy with the hero enquiry form without fixed device-specific heights. The enquiry brief still stays in the browser; no sending endpoint or unconfirmed contact details have been introduced.

@@ -59,6 +59,7 @@ dialogs.forEach(dialog => {
 const serviceDialog = document.getElementById('service-dialog');
 let selectedService = '';
 document.querySelectorAll('[data-service]').forEach(button => button.addEventListener('click', () => {
+  if (header.classList.contains('mega-open')) { closeMega(true); closeMenu(); }
   const service = services[button.dataset.service];
   selectedService = service.title;
   document.getElementById('dialog-title').textContent = service.title;
@@ -164,6 +165,8 @@ document.getElementById('copy-brief').addEventListener('click', async () => {
 document.getElementById('privacy-button').addEventListener('click', () => openDialog(document.getElementById('privacy-dialog')));
 document.getElementById('year').textContent = new Date().getFullYear();
 
+document.querySelectorAll('.page-hero h1, .contact-intro-note, .contact-intro-bottom, .contact-copy>h2, .contact-copy>p, .contact-checklist article, .values-grid article, .about-story>div, .sector-grid>a').forEach(element => element.classList.add('reveal'));
+
 if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   document.documentElement.classList.add('js-motion');
   const observer = new IntersectionObserver(entries => entries.forEach(entry => {
@@ -216,18 +219,95 @@ if (heroStage) {
     { image: '/images/security-event-real.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Every gathering.<br>A safer experience.', copy: 'An approachable presence. Clear coordination. Event security considered around your venue, your guests and your plans.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
   ];
   let active = 0;
-  function showHero(index) {
+  let heroChanging = false;
+  let paused = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pause = document.createElement('button');
+  pause.id = 'hero-pause'; pause.type = 'button';
+  function syncPause() { pause.setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow'); pause.setAttribute('aria-pressed', String(paused)); pause.textContent = paused ? '▶' : 'Ⅱ'; }
+  syncPause();
+  document.querySelector('.hero-slider-controls').append(pause);
+  pause.addEventListener('click', () => { paused = !paused; syncPause(); });
+  const preload = new Image(); preload.src = slides[1].image;
+  async function showHero(index) {
+    if (heroChanging) return;
+    heroChanging = true;
     active = (index + slides.length) % slides.length;
     const slide = slides[active], image = heroStage.querySelector('.hero-photo');
-    image.src = slide.image; image.alt = slide.alt;
-    heroStage.querySelector('h1').innerHTML = slide.title;
-    heroStage.querySelector('.hero-inner>p').textContent = slide.copy;
-    heroStage.querySelector('.hero-signature').textContent = slide.signature;
-    document.getElementById('hero-slide-count').textContent = `${String(active + 1).padStart(2, '0')} / 02`;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const controls = [document.getElementById('hero-prev'), document.getElementById('hero-next')];
+    const updateCopy = () => {
+      heroStage.querySelector('h1').innerHTML = slide.title;
+      heroStage.querySelector('.hero-inner>p').textContent = slide.copy;
+      heroStage.querySelector('.hero-signature').textContent = slide.signature;
+      document.getElementById('hero-slide-count').textContent = `${String(active + 1).padStart(2, '0')} / 02`;
+    };
+    if (reduced) { image.src = slide.image; image.alt = slide.alt; updateCopy(); heroChanging = false; return; }
+    controls.forEach(button => { button.disabled = true; });
+    const incoming = image.cloneNode();
+    incoming.removeAttribute('fetchpriority'); incoming.classList.add('hero-photo-incoming');
+    incoming.src = slide.image; incoming.alt = slide.alt; incoming.style.opacity = '0';
+    try {
+      await incoming.decode();
+      heroStage.append(incoming);
+      const text = heroStage.querySelector('.hero-inner');
+      const fadeText = text.animate([{opacity:1, transform:'translateY(0)'},{opacity:0, transform:'translateY(-7px)'}],{duration:220,easing:'ease-in',fill:'forwards'});
+      const fadeImage = incoming.animate([{opacity:0, transform:'scale(1.025)'},{opacity:1, transform:'scale(1)'}],{duration:1050,easing:'cubic-bezier(.2,.65,.25,1)',fill:'forwards'});
+      await fadeText.finished; updateCopy(); fadeText.cancel();
+      text.animate([{opacity:0, transform:'translateY(10px)'},{opacity:1, transform:'translateY(0)'}],{duration:600,easing:'cubic-bezier(.2,.65,.25,1)'});
+      await fadeImage.finished;
+      image.src = slide.image; image.alt = slide.alt;
+      await image.decode();
+    } catch { image.src = slide.image; image.alt = slide.alt; updateCopy(); }
+    finally { incoming.remove(); controls.forEach(button => { button.disabled = false; }); heroChanging = false; }
   }
+  setInterval(() => {
+    if (!paused && !document.hidden && !document.querySelector('.site-header.mega-open') && !document.body.classList.contains('menu-open') && !heroStage.closest('.immersive-hero').matches(':hover, :focus-within') && heroStage.getBoundingClientRect().bottom > 0 && !document.querySelector('dialog[open]')) showHero(active + 1);
+  }, 8500);
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', event => { if(event.matches) { paused = true; syncPause(); } });
   document.getElementById('hero-prev').addEventListener('click', () => showHero(active - 1));
   document.getElementById('hero-next').addEventListener('click', () => showHero(active + 1));
   let touchStart = 0;
   heroStage.addEventListener('touchstart', event => { touchStart = event.changedTouches[0].clientX; }, { passive: true });
   heroStage.addEventListener('touchend', event => { const delta = event.changedTouches[0].clientX - touchStart; if (Math.abs(delta) > 70) showHero(active + (delta < 0 ? 1 : -1)); }, { passive: true });
+}
+
+// Shared services disclosure: mouse, keyboard and mobile support without menu-role restrictions.
+const megaPanel = document.getElementById('services-mega');
+const megaTriggers = [...document.querySelectorAll('.mega-trigger')];
+let lastMegaTrigger = megaTriggers[0];
+function closeMega(restoreFocus = false) {
+  header.classList.remove('mega-open'); megaPanel.inert = true;
+  megaTriggers.forEach(trigger => trigger.setAttribute('aria-expanded', 'false'));
+  if (restoreFocus) lastMegaTrigger.focus({preventScroll:true});
+}
+function openMega(trigger) {
+  lastMegaTrigger = trigger; header.classList.add('mega-open'); megaPanel.inert = false;
+  megaTriggers.forEach(item => item.setAttribute('aria-expanded', 'true'));
+}
+megaTriggers.forEach(trigger => {
+  trigger.addEventListener('click', () => header.classList.contains('mega-open') ? closeMega() : openMega(trigger));
+  trigger.addEventListener('keydown', event => { if(event.key === 'ArrowDown') { event.preventDefault(); openMega(trigger); megaPanel.querySelector('a,button').focus(); } });
+});
+document.querySelector('.mega-close').addEventListener('click', () => closeMega(true));
+document.querySelector('.mega-backdrop').addEventListener('click', () => closeMega());
+megaPanel.querySelectorAll('a').forEach(item => item.addEventListener('click', () => { closeMega(); closeMenu(); }));
+document.addEventListener('keydown', event => {
+  if (!header.classList.contains('mega-open')) return;
+  if(event.key === 'Escape') { event.preventDefault(); event.stopImmediatePropagation(); closeMega(true); return; }
+  if(event.key === 'Tab') {
+    const items=[lastMegaTrigger,...megaPanel.querySelectorAll('a,button')];
+    const first=items[0],last=items.at(-1);
+    if(!event.shiftKey && document.activeElement===first) { event.preventDefault(); items[1].focus(); return; }
+    if(event.shiftKey && document.activeElement===first) { event.preventDefault(); last.focus(); }
+    else if(!event.shiftKey && document.activeElement===last) { event.preventDefault(); first.focus(); }
+  }
+}, true);
+document.addEventListener('pointerdown', event => { if(header.classList.contains('mega-open') && !header.contains(event.target)) closeMega(); });
+matchMedia('(min-width:701px)').addEventListener('change', () => closeMega());
+
+// Keep the hero copy aligned with the enquiry form at every desktop breakpoint.
+if (heroLeadForm) {
+  const alignHero = () => document.querySelector('.immersive-hero').style.setProperty('--hero-form-height', `${heroLeadForm.getBoundingClientRect().height}px`);
+  alignHero();
+  if ('ResizeObserver' in window) new ResizeObserver(alignHero).observe(heroLeadForm);
 }
