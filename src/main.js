@@ -370,3 +370,47 @@ dayTabs.forEach((tab,i) => {
     if(index !== undefined) {event.preventDefault();chooseDay(index,true);}
   });
 });
+
+// Editorial testimonial carousel. Sample status stays visible for every slide.
+const testimonialSection = document.querySelector('.testimonial-section');
+if(testimonialSection) {
+  const slides = [...testimonialSection.querySelectorAll('[data-testimonial-slide]')];
+  const categories = [...testimonialSection.querySelectorAll('[data-testimonial-index]')];
+  const prev = document.getElementById('testimonial-prev'), next = document.getElementById('testimonial-next');
+  const pause = document.getElementById('testimonial-pause');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let active = 0, moving = false, paused = reduced.matches;
+  function syncTestimonialPause() {
+    pause.setAttribute('aria-pressed',String(paused));
+    pause.setAttribute('aria-label',paused?'Play testimonial slideshow':'Pause testimonial slideshow');
+    pause.innerHTML=paused?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7-11 7V5Z"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12M16 6v12"/></svg>';
+  }
+  syncTestimonialPause();
+  async function showTestimonial(index, announce = false) {
+    const target = (index + slides.length) % slides.length;
+    if(moving || target === active) return;
+    moving = true; prev.disabled = true; next.disabled = true;
+    try {
+      if(!reduced.matches) await slides[active].animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-7px)'}],{duration:180,easing:'ease-in'}).finished;
+      slides[active].hidden = true; active = target; slides[active].hidden = false;
+      categories.forEach((button,i)=>button.setAttribute('aria-pressed',String(i===active)));
+      document.getElementById('testimonial-current').textContent=String(active+1).padStart(2,'0');
+      testimonialSection.querySelector('.testimonial-progress>span').style.width=`${(active+1)/slides.length*100}%`;
+      if(announce) testimonialSection.querySelector('.testimonial-status').textContent=`Sample perspective ${active+1} of ${slides.length}. ${slides[active].querySelector('strong').textContent}.`;
+      if(!reduced.matches) await slides[active].animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:600,easing:'cubic-bezier(.2,.7,.2,1)'}).finished;
+    } finally {moving=false;prev.disabled=false;next.disabled=false;}
+  }
+  categories.forEach((button,i)=>button.addEventListener('click',()=>showTestimonial(i,true)));
+  prev.addEventListener('click',()=>showTestimonial(active-1,true));
+  next.addEventListener('click',()=>showTestimonial(active+1,true));
+  pause.addEventListener('click',()=>{paused=!paused;syncTestimonialPause();});
+  testimonialSection.querySelector('.testimonial-stage').addEventListener('keydown',event=>{
+    if(event.key==='ArrowRight'){event.preventDefault();showTestimonial(active+1,true);}
+    if(event.key==='ArrowLeft'){event.preventDefault();showTestimonial(active-1,true);}
+  });
+  reduced.addEventListener('change',event=>{if(event.matches){paused=true;syncTestimonialPause();}});
+  setInterval(()=>{
+    const bounds=testimonialSection.getBoundingClientRect();
+    if(!paused&&!document.hidden&&bounds.top<innerHeight&&bounds.bottom>0&&!testimonialSection.matches(':hover,:focus-within')&&!document.querySelector('dialog[open],.site-header.mega-open,.site-header.call-open')&&!document.body.classList.contains('menu-open'))showTestimonial(active+1);
+  },8500);
+}

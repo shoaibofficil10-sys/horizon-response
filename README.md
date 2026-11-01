@@ -94,3 +94,7 @@ The homepage has a short Daytime / Evenings / After hours section with keyboard-
 The header call action now reveals an anchored, non-modal phone-shaped dropdown with a smooth drop entrance. Its saved example number is read-only; the visual keypad is decorative and no digit-edit, clear or delete action is exposed. The call link always uses the configured saved number. Escape, click outside, close, focus containment and reduced motion are supported.
 
 The short homepage section now explains Horizon's three service groupings: site guarding; mobile patrols, alarm arrangements and after-hours security; and specialist security for events, residential communities, campuses and healthcare.
+
+## Testimonial design section
+
+The homepage ends with an editorial testimonial carousel immediately before the footer. Sector navigation, previous/next controls, keyboard arrows, pause/play, gentle fades and reduced-motion support are included. The three perspectives are explicitly labelled illustrative samples, not verified client reviews. Replace their quotes and attributions with approved client feedback before presenting them as genuine testimonials; no ratings or review structured data have been added.
