@@ -4,12 +4,11 @@ test('desktop mega menu opens on hover and stays open while entering its panel',
  await page.setViewportSize({width:1440,height:1000});await page.goto('/');
  const trigger=page.locator('.desktop-nav .mega-trigger');await trigger.hover();
  await expect(trigger).toHaveAttribute('aria-expanded','true');
- await page.locator('.mega-service[data-service="campus"]').hover();
+ await page.locator('.mega-service[data-quote="campus"]').hover();
  await expect(trigger).toHaveAttribute('aria-expanded','true');
- await page.locator('.mega-service[data-service="campus"]').click();
- await expect(page.locator('#dialog-title')).toHaveText('Campus Security');
- await page.getByRole('button',{name:'Include in my brief'}).click();
- await expect(page.locator('#service')).toHaveValue('Campus Security');
+ await page.locator('.mega-service[data-quote="campus"]').click();
+ await expect(page.locator('#quote-service')).toHaveValue('Campus Security');
+ await expect(page.locator('#quote-dialog')).toBeVisible();
 });
 
 test('all pages expose the four new services through menus, footer and enquiry choices',async({page})=>{

@@ -29,3 +29,7 @@ The HR brand asset was prepared from the user-supplied logo reference. Supportin
 ## Additional specialist services
 
 `public/images/security-specialist-services.webp` is an original AI-generated four-scene illustration sheet for mobile patrols, alarm-service coordination, campus security and healthcare security. It was converted to WebP at the original dimensions. The people, vehicle and facilities are illustrative and are not verified employees, assets or client premises.
+
+## Black-uniform security photography style
+
+The four `security-black-uniform-*.webp` assets are original AI-generated photographic-style illustrations inspired by the supplied reference: black security uniforms, white SECURITY lettering and radios. They replace the previous photography throughout the public pages and social preview. They depict illustrative people and locations, not verified Horizon staff, vehicles or client sites. Hero/event images are single scenes; the service sheets use CSS to frame each scene without stretching. Brand marks remain unchanged.

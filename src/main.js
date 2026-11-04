@@ -61,26 +61,6 @@ dialogs.forEach(dialog => {
   });
 });
 
-const serviceDialog = document.getElementById('service-dialog');
-let selectedService = '';
-document.querySelectorAll('[data-service]').forEach(button => button.addEventListener('click', () => {
-  if (header.classList.contains('mega-open')) { closeMega(true); closeMenu(); }
-  const service = services[button.dataset.service];
-  selectedService = service.title;
-  document.getElementById('dialog-title').textContent = service.title;
-  document.getElementById('dialog-description').textContent = service.description;
-  const list = document.getElementById('dialog-list');
-  list.replaceChildren(...service.points.map(text => { const item = document.createElement('li'); item.textContent = text; return item; }));
-  openDialog(serviceDialog);
-}));
-document.getElementById('dialog-enquire').addEventListener('click', () => {
-  if (!document.getElementById('brief-form')) { location.href = '/contact/?service=' + encodeURIComponent(selectedService); return; }
-  document.getElementById('service').value = selectedService;
-  serviceDialog.close();
-  document.getElementById('contact').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-  document.getElementById('location').focus({ preventScroll: true });
-});
-
 const form = document.getElementById('brief-form');
 let currentBrief = '';
 form?.addEventListener('submit', event => {
@@ -188,8 +168,8 @@ if (form) {
 const heroStage = document.querySelector('.hero-stage');
 if (heroStage) {
   const slides = [
-    { image: '/images/security-professional-hero.webp', alt: 'Two professional security officers at a landscaped modern commercial entrance', title: 'Trusted Security Provider for Businesses in Brisbane, Gold Coast, Logan, and Ipswich', copy: 'Professional security guards, mobile patrols and specialist services, shaped around your people, property and operating hours.', signature: 'YOUR BUSINESS. YOUR PEOPLE. OUR FOCUS.' },
-    { image: '/images/security-event-real.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Professional Security for Your Events and Communities', copy: 'From events and crowd control to residential, campus and healthcare security, plan an approachable presence for the places that matter.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
+    { image: '/images/security-black-uniform-hero.webp', alt: 'Two professional security officers at a landscaped modern commercial entrance', title: 'Trusted Security Provider for Businesses in Brisbane, Gold Coast, Logan, and Ipswich', copy: 'Professional security guards, mobile patrols and specialist services, shaped around your people, property and operating hours.', signature: 'YOUR BUSINESS. YOUR PEOPLE. OUR FOCUS.' },
+    { image: '/images/security-black-uniform-event.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Professional Security for Your Events and Communities', copy: 'From events and crowd control to residential, campus and healthcare security, plan an approachable presence for the places that matter.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
   ];
   let active = 0;
   let heroChanging = false;
@@ -421,6 +401,8 @@ if(quoteDialog) {
   const quoteForm = document.getElementById('quote-form'), quoteResult = document.getElementById('quote-result');
   let quoteBrief = '';
   document.querySelectorAll('[data-quote]').forEach(button=>button.addEventListener('click',()=>{
+    if (header.classList.contains('mega-open')) closeMega(true);
+    closeMenu();
     quoteForm.hidden=false; quoteResult.hidden=true;
     quoteForm.elements.service.value=services[button.dataset.quote].title;
     openDialog(quoteDialog); document.getElementById('quote-name').focus();

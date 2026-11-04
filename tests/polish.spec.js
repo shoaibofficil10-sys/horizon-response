@@ -11,11 +11,10 @@ test('desktop mega menu opens by keyboard, closes with Escape and opens the sele
  await expect(trigger).toHaveAttribute('aria-expanded','false');
  await expect(trigger).toBeFocused();
  await trigger.click();
- await page.locator('.mega-service[data-service="event"]').click();
- await expect(page.locator('#dialog-title')).toHaveText('Event Security & Crowd Control');
+ await page.locator('.mega-service[data-quote="event"]').click();
+ await expect(page.locator('#quote-service')).toHaveValue('Event Security & Crowd Control');
  await expect(trigger).toHaveAttribute('aria-expanded','false');
- await page.getByRole('button',{name:'Include in my brief'}).click();
- await expect(page.locator('#service')).toHaveValue('Event Security & Crowd Control');
+ await expect(page.locator('#quote-name')).toBeFocused();
 });
 
 test('mobile mega menu fits, contains focus and returns to the navigation',async({page})=>{
@@ -55,7 +54,7 @@ test('animated hero transitions load the next image and slideshow can be paused'
  await expect(page.getByRole('button',{name:'Play slideshow'})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'Next hero slide'}).click();
  await expect(page.locator('#hero-slide-count')).toHaveText('02 / 02');
- await expect(page.locator('.hero-photo').first()).toHaveAttribute('src','/images/security-event-real.webp');
+ await expect(page.locator('.hero-photo').first()).toHaveAttribute('src','/images/security-black-uniform-event.webp');
  await expect(page.locator('.hero-photo-incoming')).toHaveCount(0);
  await expect(page.getByRole('button',{name:'Next hero slide'})).toBeEnabled();
 });

@@ -142,7 +142,7 @@ test('hero lead form validates details and carries them into the full enquiry br
   page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()); });
   await page.goto('/');
   expect(await page.locator('.hero-photo').evaluate(img => getComputedStyle(img).objectFit)).toBe('cover');
-  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-professional-hero.webp');
+  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-black-uniform-hero.webp');
   await expect(page.locator('.hero-signature')).toHaveText('YOUR BUSINESS. YOUR PEOPLE. OUR FOCUS.');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
   await expect(page.locator('#hero-name')).toBeFocused();
@@ -181,6 +181,6 @@ test('service gallery selection, arrows and footer service details work', async 
   await page.locator('#service-afterhours .service-link').click();
   await expect(page.locator('#quote-service')).toHaveValue('After-Hours Security Services');
   await page.keyboard.press('Escape');
-  await page.locator('footer [data-service="event"]').click();
-  await expect(page.locator('#dialog-title')).toHaveText('Event Security & Crowd Control');
+  await page.locator('footer [data-quote="event"]').click();
+  await expect(page.locator('#quote-service')).toHaveValue('Event Security & Crowd Control');
 });

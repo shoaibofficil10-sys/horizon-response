@@ -59,19 +59,9 @@ test('every page fits mobile and tablet widths; mobile links reach the new pages
   await expect(page).toHaveURL(/\/contact\/$/);
 });
 
-test('About page service links reach the contact brief and produce the selected enquiry',async ({page})=>{
-  await page.goto('/about/');
-  await page.locator('footer [data-service="construction"]').click();
-  await page.getByRole('button',{name:'Include in my brief'}).click();
-  await expect(page).toHaveURL(/\/contact\/\?service=/);
-  await expect(page.locator('#service')).toHaveValue('Construction Site Security');
-  await page.getByLabel('Site location').fill('Melbourne, VIC');
-  await page.getByLabel('What do you have in mind?').fill('After-hours access monitoring for a construction project.');
-
-  await page.getByLabel('Your name').fill('Jamie Test');
-  await page.getByLabel('Phone / mobile').fill('0400 111 222');
-  await page.getByLabel('Email address').fill('jamie@example.com');
-  await page.getByRole('button',{name:'Prepare my security brief'}).click();
-  await expect(page.locator('#brief-preview')).toContainText('Construction Site Security');
-  await expect(page.locator('#brief-preview')).toContainText('Jamie Test');
+test('About footer opens the selected service quote without navigating away',async ({page})=>{
+ await page.goto('/about/');await page.locator('footer [data-quote="construction"]').click();
+ await expect(page).toHaveURL(/\/about\//);await expect(page.locator('#quote-service')).toHaveValue('Construction Site Security');
+ await page.locator('#quote-name').fill('Jamie Test');await page.locator('#quote-email').fill('jamie@example.com');await page.locator('#quote-phone').fill('0400 111 222');
+ await page.getByRole('button',{name:'Request Quote',exact:true}).click();await expect(page.locator('#quote-preview')).toContainText('Jamie Test');
 });
