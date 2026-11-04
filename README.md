@@ -101,6 +101,6 @@ The homepage ends with an editorial testimonial carousel immediately before the 
 
 ## Reference-inspired Horizon update
 
-A separate Legion Security brief was supplied as a visual/content reference, not as the deployment target or an instruction to reuse that company's identity, email or credentials. The homepage now has a centered four-paragraph About section, a seven-item single-open Horizon Advantage accordion, a skyline hero with a solid navy content box and Contact Us anchor, and centered contact introductions on the homepage and Contact Us page. Gold accents apply to these reference-inspired elements while existing Horizon navigation, service layouts and unrelated sections remain in place.
+A separate Legion Security brief supplied content ideas only. Horizon's original hero photography, green palette, typography, split About and Contact layouts, service cards, navigation and footer are retained. About copy is adapted to Horizon, and the seven Horizon Advantage points use the site's existing FAQ accordion design. No Legion identity, email or credentials are reused.
 
 Each homepage service card now opens a native Get a Free Quote dialog with preselected service and inline validation. Quote requests use the existing browser-local download/copy flow, as the user will provide Horizon's email later. No request is emailed, no email address from the reference is used, and no sent/success or response-time promise is shown.

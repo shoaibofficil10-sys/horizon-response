@@ -3,24 +3,23 @@ import AxeBuilder from '@axe-core/playwright';
 
 test('Horizon content keeps the reference identity and unsupported claims out of the site',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');
- await expect(page.locator('.reference-copy>p')).toHaveCount(4);
- await expect(page.locator('.reference-copy')).toContainText('Horizon Response Services');
- await expect(page.locator('.reference-copy strong')).toHaveCount(4);
+ await expect(page.locator('.intro-copy>p')).toHaveCount(4);
+ await expect(page.locator('.intro-copy')).toContainText('Horizon Response Services');
+ await expect(page.locator('.intro-copy strong')).toHaveCount(4);
  await expect(page.locator('body')).not.toContainText('Legion');
  await expect(page.locator('body')).not.toContainText('Decades of Experience');
  await expect(page.locator('a[href*="legionsecurity"]')).toHaveCount(0);
- await expect(page.locator('.hero-actions a')).toHaveAttribute('href','#contact');
+ await expect(page.locator('.hero-actions a').first()).toHaveAttribute('href','#services');
 });
 
-test('advantage accordion is single-open and keyboard operable',async({page})=>{
- await page.goto('/');const buttons=page.locator('.advantage-item h3>button');
- await expect(buttons).toHaveCount(7);
- await buttons.nth(0).click();await expect(buttons.nth(0)).toHaveAttribute('aria-expanded','true');
- await buttons.nth(1).focus();await page.keyboard.press('Enter');
- await expect(buttons.nth(1)).toHaveAttribute('aria-expanded','true');
- await expect(buttons.nth(0)).toHaveAttribute('aria-expanded','false');
- await expect(page.locator('.advantage-item.is-open')).toHaveCount(1);
- await page.keyboard.press('Space');await expect(page.locator('.advantage-item.is-open')).toHaveCount(0);
+test('advantage uses the existing accordion design and keyboard controls',async({page})=>{
+ await page.goto('/');const items=page.locator('.horizon-advantage details');
+ await expect(items).toHaveCount(7);
+ await items.nth(0).locator('summary').click();await expect(items.nth(0)).toHaveAttribute('open','');
+ await items.nth(1).locator('summary').focus();await page.keyboard.press('Enter');
+ await expect(items.nth(1)).toHaveAttribute('open','');
+ await expect(items.nth(0)).not.toHaveAttribute('open','');
+ await page.keyboard.press('Space');await expect(items.nth(1)).not.toHaveAttribute('open','');
 });
 
 test('quote popup validates inline, traps focus and downloads the selected request honestly',async({page})=>{

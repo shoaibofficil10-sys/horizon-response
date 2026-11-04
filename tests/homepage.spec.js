@@ -142,8 +142,8 @@ test('hero lead form validates details and carries them into the full enquiry br
   page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()); });
   await page.goto('/');
   expect(await page.locator('.hero-photo').evaluate(img => getComputedStyle(img).objectFit)).toBe('cover');
-  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/horizon-city-sunset.webp');
-  await expect(page.locator('.hero-signature')).toHaveText('HORIZON RESPONSE SERVICES. A CONSIDERED PRESENCE.');
+  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-professional-hero.webp');
+  await expect(page.locator('.hero-signature')).toHaveText('PROFESSIONAL PRESENCE. PERSONAL APPROACH.');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
   await expect(page.locator('#hero-name')).toBeFocused();
   await page.locator('#hero-name').fill('Jamie Example');

@@ -10,10 +10,10 @@ test('hero slideshow fills the viewport and service text remains inset and compa
     expect(Math.round(stage.width)).toBe(width);
     expect(Math.round(stage.height)).toBe(900);
     await page.getByRole('button',{name:'Next hero slide'}).click();
-    await expect(page.locator('h1')).toContainText('Your environment.');
+    await expect(page.locator('h1')).toContainText('Every gathering.');
     await expect(page.locator('#hero-slide-count')).toHaveText('02 / 02');
     await page.getByRole('button',{name:'Previous hero slide'}).click();
-    await expect(page.locator('h1')).toContainText('Trusted security.');
+    await expect(page.locator('h1')).toContainText('Confidence.');
     const card=await page.locator('.service-card').first().boundingBox();
     const panel=await page.locator('.service-content').first().boundingBox();
     expect(panel.y).toBeGreaterThan(card.y+card.height/2);

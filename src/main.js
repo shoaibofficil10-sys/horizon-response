@@ -188,8 +188,8 @@ if (form) {
 const heroStage = document.querySelector('.hero-stage');
 if (heroStage) {
   const slides = [
-    { image: '/images/horizon-city-sunset.webp', alt: 'Illustrative Australian river-city skyline at golden hour', title: 'Trusted security.<br>For people. For places.', copy: 'Professional guarding, patrols and specialist security, considered around your site and operating hours.', signature: 'HORIZON RESPONSE SERVICES. A CONSIDERED PRESENCE.' },
-    { image: '/images/horizon-city-sunset.webp', alt: 'Illustrative Australian river-city skyline at golden hour', title: 'Your environment.<br>A clearer security plan.', copy: 'From workplaces to events and communities, start with the people, places and details that matter.', signature: 'YOUR PEOPLE. YOUR PLACE. OUR FOCUS.' }
+    { image: '/images/security-professional-hero.webp', alt: 'Two professional security officers at a landscaped modern commercial entrance', title: 'Confidence.<br>Where it matters.', copy: 'For the places you work. The communities you call home. And the moments that bring people together.', signature: 'PROFESSIONAL PRESENCE. PERSONAL APPROACH.' },
+    { image: '/images/security-event-real.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Every gathering.<br>A safer experience.', copy: 'An approachable presence. Clear coordination. Event security considered around your venue, your guests and your plans.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
   ];
   let active = 0;
   let heroChanging = false;
@@ -414,29 +414,6 @@ if(testimonialSection) {
     if(!paused&&!document.hidden&&bounds.top<innerHeight&&bounds.bottom>0&&!testimonialSection.matches(':hover,:focus-within')&&!document.querySelector('dialog[open],.site-header.mega-open,.site-header.call-open')&&!document.body.classList.contains('menu-open'))showTestimonial(active+1);
   },8500);
 }
-
-// Single-open, keyboard-accessible advantage accordion with a CSS height transition.
-const advantageButtons = [...document.querySelectorAll('.advantage-item h3>button')];
-advantageButtons.forEach((button,index) => {
-  button.addEventListener('click', () => {
-    const open = button.getAttribute('aria-expanded') !== 'true';
-    advantageButtons.forEach(item => {
-      const expanded = item === button && open;
-      const panel = document.getElementById(item.getAttribute('aria-controls'));
-      item.setAttribute('aria-expanded', String(expanded));
-      item.closest('.advantage-item').classList.toggle('is-open',expanded);
-      panel.setAttribute('aria-hidden',String(!expanded)); panel.inert = !expanded;
-    });
-  });
-  button.addEventListener('keydown',event=>{
-    let target;
-    if(event.key==='ArrowDown')target=(index+1)%advantageButtons.length;
-    if(event.key==='ArrowUp')target=(index+advantageButtons.length-1)%advantageButtons.length;
-    if(event.key==='Home')target=0;
-    if(event.key==='End')target=advantageButtons.length-1;
-    if(target!==undefined){event.preventDefault();advantageButtons[target].focus();}
-  });
-});
 
 // Quote requests share the existing browser-local download/copy delivery method.
 const quoteDialog = document.getElementById('quote-dialog');

@@ -29,7 +29,3 @@ The HR brand asset was prepared from the user-supplied logo reference. Supportin
 ## Additional specialist services
 
 `public/images/security-specialist-services.webp` is an original AI-generated four-scene illustration sheet for mobile patrols, alarm-service coordination, campus security and healthcare security. It was converted to WebP at the original dimensions. The people, vehicle and facilities are illustrative and are not verified employees, assets or client premises.
-
-## Reference-inspired skyline and advantage visuals
-
-`horizon-city-sunset.webp` is an original AI-generated photographic-style illustration of an Australian river-city skyline inspired by Brisbane, not a verified photograph of a particular location. `horizon-advantage-shields.webp` is an original AI-generated grayscale diptych of an alert shield and a hand holding a checked shield. Both were converted to WebP at their original dimensions; CSS frames the shield scenes in circles.

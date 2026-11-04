@@ -55,7 +55,7 @@ test('animated hero transitions load the next image and slideshow can be paused'
  await expect(page.getByRole('button',{name:'Play slideshow'})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'Next hero slide'}).click();
  await expect(page.locator('#hero-slide-count')).toHaveText('02 / 02');
- await expect(page.locator('.hero-photo').first()).toHaveAttribute('src','/images/horizon-city-sunset.webp');
+ await expect(page.locator('.hero-photo').first()).toHaveAttribute('src','/images/security-event-real.webp');
  await expect(page.locator('.hero-photo-incoming')).toHaveCount(0);
  await expect(page.getByRole('button',{name:'Next hero slide'})).toBeEnabled();
 });
