@@ -9,7 +9,7 @@ test('Horizon content keeps the reference identity and unsupported claims out of
  await expect(page.locator('body')).not.toContainText('Legion');
  await expect(page.locator('body')).not.toContainText('Decades of Experience');
  await expect(page.locator('a[href*="legionsecurity"]')).toHaveCount(0);
- await expect(page.locator('.hero-actions a').first()).toHaveAttribute('href','#services');
+ await expect(page.locator('.hero-actions a').first()).toHaveAttribute('href','#contact');
 });
 
 test('advantage uses the existing accordion design and keyboard controls',async({page})=>{

@@ -143,7 +143,7 @@ test('hero lead form validates details and carries them into the full enquiry br
   await page.goto('/');
   expect(await page.locator('.hero-photo').evaluate(img => getComputedStyle(img).objectFit)).toBe('cover');
   await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-professional-hero.webp');
-  await expect(page.locator('.hero-signature')).toHaveText('PROFESSIONAL PRESENCE. PERSONAL APPROACH.');
+  await expect(page.locator('.hero-signature')).toHaveText('YOUR BUSINESS. YOUR PEOPLE. OUR FOCUS.');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
   await expect(page.locator('#hero-name')).toBeFocused();
   await page.locator('#hero-name').fill('Jamie Example');

@@ -188,8 +188,8 @@ if (form) {
 const heroStage = document.querySelector('.hero-stage');
 if (heroStage) {
   const slides = [
-    { image: '/images/security-professional-hero.webp', alt: 'Two professional security officers at a landscaped modern commercial entrance', title: 'Confidence.<br>Where it matters.', copy: 'For the places you work. The communities you call home. And the moments that bring people together.', signature: 'PROFESSIONAL PRESENCE. PERSONAL APPROACH.' },
-    { image: '/images/security-event-real.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Every gathering.<br>A safer experience.', copy: 'An approachable presence. Clear coordination. Event security considered around your venue, your guests and your plans.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
+    { image: '/images/security-professional-hero.webp', alt: 'Two professional security officers at a landscaped modern commercial entrance', title: 'Trusted Security Provider for Businesses in Brisbane, Gold Coast, Logan, and Ipswich', copy: 'Professional security guards, mobile patrols and specialist services, shaped around your people, property and operating hours.', signature: 'YOUR BUSINESS. YOUR PEOPLE. OUR FOCUS.' },
+    { image: '/images/security-event-real.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Professional Security for Your Events and Communities', copy: 'From events and crowd control to residential, campus and healthcare security, plan an approachable presence for the places that matter.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
   ];
   let active = 0;
   let heroChanging = false;
