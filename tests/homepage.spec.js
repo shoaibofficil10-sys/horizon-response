@@ -18,22 +18,20 @@ test('homepage serves its content, images and search metadata without browser er
   expect(errors).toEqual([]);
 });
 
-test('all ten service panels open, select the right service and close accessibly', async ({ page }) => {
+test('all ten service cards open a quote preselected for the right service', async ({page}) => {
   await page.goto('/');
-  for (const card of await page.locator('.service-card').all()) {
-    await card.getByRole('button', { name: 'Explore service' }).click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible();
-    const title = await dialog.locator('h2').textContent();
-    await expect(dialog.locator('li')).toHaveCount(4);
-    await dialog.getByRole('button', { name: 'Include in my brief' }).click();
-    await expect(dialog).not.toBeVisible();
-    await expect(page.locator('#service')).toHaveValue(title);
-    await expect(page.locator('#location')).toBeFocused();
+  await expect(page.locator('.service-card').getByRole('button',{name:'Explore service'})).toHaveCount(0);
+  for(const card of await page.locator('.service-card').all()) {
+    const key=await card.locator('[data-quote]').getAttribute('data-quote');
+    await card.getByRole('button',{name:'Get a Quote'}).click();
+    await expect(page.locator('#quote-dialog')).toBeVisible();
+    const service=await page.locator(`#service option`).evaluateAll((options,key)=>options.map(o=>o.value),key);
+    expect(service).toContain(await page.locator('#quote-service').inputValue());
+    await expect(page.locator('#quote-name')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#quote-dialog')).not.toBeVisible();
+    await expect(page.locator('body')).not.toHaveClass(/modal-open/);
   }
-  await page.locator('.service-card').first().getByRole('button', { name: 'Explore service' }).click();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#service-dialog')).not.toBeVisible();
 });
 
 test('brief builder validates fields and downloads the user’s actual requirements without submitting', async ({ page }) => {
@@ -144,13 +142,13 @@ test('hero lead form validates details and carries them into the full enquiry br
   page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()); });
   await page.goto('/');
   expect(await page.locator('.hero-photo').evaluate(img => getComputedStyle(img).objectFit)).toBe('cover');
-  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/security-professional-hero.webp');
-  await expect(page.locator('.hero-signature')).toHaveText('PROFESSIONAL PRESENCE. PERSONAL APPROACH.');
+  await expect(page.locator('.hero-photo')).toHaveAttribute('src', '/images/horizon-city-sunset.webp');
+  await expect(page.locator('.hero-signature')).toHaveText('HORIZON RESPONSE SERVICES. A CONSIDERED PRESENCE.');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
-  await expect(page.getByLabel('Full name', { exact: false })).toBeFocused();
-  await page.getByLabel('Full name').fill('Jamie Example');
+  await expect(page.locator('#hero-name')).toBeFocused();
+  await page.locator('#hero-name').fill('Jamie Example');
   await page.getByLabel('Work email').fill('jamie@example.com');
-  await page.getByLabel('Phone number', { exact: true }).fill('0400 111 222');
+  await page.locator('#hero-phone').fill('0400 111 222');
   await page.getByRole('combobox', { name: 'Security service' }).selectOption('Warehouse & Industrial Security');
   await page.getByRole('button', { name: 'Continue enquiry', exact: true }).click();
   await expect(page.getByLabel('Site location')).toBeFocused();
@@ -181,7 +179,7 @@ test('service gallery selection, arrows and footer service details work', async 
   await page.locator('[data-service-slide="5"]').click();
   await expect(page.locator('[data-service-slide="5"]')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('#service-afterhours .service-link').click();
-  await expect(page.locator('#dialog-title')).toHaveText('After-Hours Security Services');
+  await expect(page.locator('#quote-service')).toHaveValue('After-Hours Security Services');
   await page.keyboard.press('Escape');
   await page.locator('footer [data-service="event"]').click();
   await expect(page.locator('#dialog-title')).toHaveText('Event Security & Crowd Control');

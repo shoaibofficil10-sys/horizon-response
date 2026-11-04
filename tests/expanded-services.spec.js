@@ -27,8 +27,7 @@ test('all pages expose the four new services through menus, footer and enquiry c
  await page.goto('/');
  for(const [key,title] of [['mobile','Mobile Patrols'],['alarm','Alarm Services'],['campus','Campus Security'],['healthcare','Healthcare Security']]){
   await page.locator(`#service-${key} .service-link`).click();
-  await expect(page.locator('#dialog-title')).toHaveText(title);
-  await page.getByRole('button',{name:'Include in my brief'}).click();
-  await expect(page.locator('#service')).toHaveValue(title);
+  await expect(page.locator('#quote-service')).toHaveValue(title);
+  await page.keyboard.press('Escape');
  }
 });

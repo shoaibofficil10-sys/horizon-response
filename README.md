@@ -98,3 +98,9 @@ The short homepage section now explains Horizon's three service groupings: site 
 ## Testimonial design section
 
 The homepage ends with an editorial testimonial carousel immediately before the footer. Sector navigation, previous/next controls, keyboard arrows, pause/play, gentle fades and reduced-motion support are included. The three perspectives are explicitly labelled illustrative samples, not verified client reviews. Replace their quotes and attributions with approved client feedback before presenting them as genuine testimonials; no ratings or review structured data have been added.
+
+## Reference-inspired Horizon update
+
+A separate Legion Security brief was supplied as a visual/content reference, not as the deployment target or an instruction to reuse that company's identity, email or credentials. The homepage now has a centered four-paragraph About section, a seven-item single-open Horizon Advantage accordion, a skyline hero with a solid navy content box and Contact Us anchor, and centered contact introductions on the homepage and Contact Us page. Gold accents apply to these reference-inspired elements while existing Horizon navigation, service layouts and unrelated sections remain in place.
+
+Each homepage service card now opens a native Get a Free Quote dialog with preselected service and inline validation. Quote requests use the existing browser-local download/copy flow, as the user will provide Horizon's email later. No request is emailed, no email address from the reference is used, and no sent/success or response-time promise is shown.

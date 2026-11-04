@@ -188,8 +188,8 @@ if (form) {
 const heroStage = document.querySelector('.hero-stage');
 if (heroStage) {
   const slides = [
-    { image: '/images/security-professional-hero.webp', alt: 'Two professional security officers at a landscaped modern commercial entrance', title: 'Confidence.<br>Where it matters.', copy: 'For the places you work. The communities you call home. And the moments that bring people together.', signature: 'PROFESSIONAL PRESENCE. PERSONAL APPROACH.' },
-    { image: '/images/security-event-real.webp', alt: 'Security officer overseeing an outdoor event in daylight', title: 'Every gathering.<br>A safer experience.', copy: 'An approachable presence. Clear coordination. Event security considered around your venue, your guests and your plans.', signature: 'EVENT SECURITY. A WELCOMING PRESENCE.' }
+    { image: '/images/horizon-city-sunset.webp', alt: 'Illustrative Australian river-city skyline at golden hour', title: 'Trusted security.<br>For people. For places.', copy: 'Professional guarding, patrols and specialist security, considered around your site and operating hours.', signature: 'HORIZON RESPONSE SERVICES. A CONSIDERED PRESENCE.' },
+    { image: '/images/horizon-city-sunset.webp', alt: 'Illustrative Australian river-city skyline at golden hour', title: 'Your environment.<br>A clearer security plan.', copy: 'From workplaces to events and communities, start with the people, places and details that matter.', signature: 'YOUR PEOPLE. YOUR PLACE. OUR FOCUS.' }
   ];
   let active = 0;
   let heroChanging = false;
@@ -413,4 +413,72 @@ if(testimonialSection) {
     const bounds=testimonialSection.getBoundingClientRect();
     if(!paused&&!document.hidden&&bounds.top<innerHeight&&bounds.bottom>0&&!testimonialSection.matches(':hover,:focus-within')&&!document.querySelector('dialog[open],.site-header.mega-open,.site-header.call-open')&&!document.body.classList.contains('menu-open'))showTestimonial(active+1);
   },8500);
+}
+
+// Single-open, keyboard-accessible advantage accordion with a CSS height transition.
+const advantageButtons = [...document.querySelectorAll('.advantage-item h3>button')];
+advantageButtons.forEach((button,index) => {
+  button.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') !== 'true';
+    advantageButtons.forEach(item => {
+      const expanded = item === button && open;
+      const panel = document.getElementById(item.getAttribute('aria-controls'));
+      item.setAttribute('aria-expanded', String(expanded));
+      item.closest('.advantage-item').classList.toggle('is-open',expanded);
+      panel.setAttribute('aria-hidden',String(!expanded)); panel.inert = !expanded;
+    });
+  });
+  button.addEventListener('keydown',event=>{
+    let target;
+    if(event.key==='ArrowDown')target=(index+1)%advantageButtons.length;
+    if(event.key==='ArrowUp')target=(index+advantageButtons.length-1)%advantageButtons.length;
+    if(event.key==='Home')target=0;
+    if(event.key==='End')target=advantageButtons.length-1;
+    if(target!==undefined){event.preventDefault();advantageButtons[target].focus();}
+  });
+});
+
+// Quote requests share the existing browser-local download/copy delivery method.
+const quoteDialog = document.getElementById('quote-dialog');
+if(quoteDialog) {
+  const quoteForm = document.getElementById('quote-form'), quoteResult = document.getElementById('quote-result');
+  let quoteBrief = '';
+  document.querySelectorAll('[data-quote]').forEach(button=>button.addEventListener('click',()=>{
+    quoteForm.hidden=false; quoteResult.hidden=true;
+    quoteForm.elements.service.value=services[button.dataset.quote].title;
+    openDialog(quoteDialog); document.getElementById('quote-name').focus();
+  }));
+  function quoteError(input,message) {
+    input.setAttribute('aria-invalid',String(Boolean(message)));
+    const error=document.getElementById(input.getAttribute('aria-describedby'));
+    if(error)error.textContent=message;
+  }
+  quoteForm.querySelectorAll('[required]').forEach(input=>input.addEventListener('input',()=>quoteError(input,'')));
+  quoteForm.addEventListener('submit',event=>{
+    event.preventDefault(); let firstInvalid;
+    for(const input of quoteForm.querySelectorAll('[required]')) {
+      let message='';
+      if(!input.value.trim())message=input.name==='service'?'Choose a security service.':`Please enter your ${input.name === 'name' ? 'full name' : input.name === 'phone' ? 'phone number' : 'email address'}.`;
+      else if(input.type==='email'&&!input.validity.valid)message='Enter a valid email address.';
+      else if(input.name==='phone'&&(!/^[+\d\s().-]+$/.test(input.value)||input.value.replace(/\D/g,'').length<7))message='Enter a valid phone number with at least 7 digits.';
+      quoteError(input,message);if(message&&!firstInvalid)firstInvalid=input;
+    }
+    if(firstInvalid){firstInvalid.focus();return;}
+    const data=new FormData(quoteForm);
+    quoteBrief=['HORIZON RESPONSE SERVICES — QUOTE REQUEST','',`Name: ${data.get('name').trim()}`,`Email: ${data.get('email').trim()}`,`Phone: ${data.get('phone').trim()}`,`Service: ${data.get('service')}`,`Location: ${data.get('location').trim()||'To be discussed'}`,'','Details:',data.get('message').trim()||'To be discussed.','','Prepared in the Horizon Response website. No enquiry has been sent.'].join('\n');
+    document.getElementById('quote-preview').textContent=quoteBrief;
+    quoteForm.hidden=true;quoteResult.hidden=false;
+    quoteResult.querySelector('h3').tabIndex=-1;quoteResult.querySelector('h3').focus();
+  });
+  document.getElementById('quote-download').addEventListener('click',()=>{
+    const url=URL.createObjectURL(new Blob([quoteBrief],{type:'text/plain;charset=utf-8'}));
+    const link=document.createElement('a');link.href=url;link.download='horizon-response-quote-request.txt';document.body.append(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    quoteResult.querySelector('.quote-copy-status').textContent='Your quote brief is ready to download.';
+  });
+  document.getElementById('quote-copy').addEventListener('click',async()=>{
+    try {await navigator.clipboard.writeText(quoteBrief);quoteResult.querySelector('.quote-copy-status').textContent='Request copied. Ready to share.';}
+    catch {quoteResult.querySelector('.quote-copy-status').textContent='Clipboard unavailable. Please download your request instead.';}
+  });
+  document.getElementById('quote-edit').addEventListener('click',()=>{quoteForm.hidden=false;quoteResult.hidden=true;document.getElementById('quote-name').focus();});
 }
