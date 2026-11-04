@@ -33,3 +33,5 @@ The HR brand asset was prepared from the user-supplied logo reference. Supportin
 ## Black-uniform security photography style
 
 The four `security-black-uniform-*.webp` assets are original AI-generated photographic-style illustrations inspired by the supplied reference: black security uniforms, white SECURITY lettering and radios. They replace the previous photography throughout the public pages and social preview. They depict illustrative people and locations, not verified Horizon staff, vehicles or client sites. Hero/event images are single scenes; the service sheets use CSS to frame each scene without stretching. Brand marks remain unchanged.
+
+`security-specialists-visible-lettering.webp` is an AI-edited version of the specialist illustration sheet, recomposed for visible SECURITY lettering above the card panels. Used only for Mobile Patrols, Alarm Services and Campus Security; the healthcare image is unchanged.
