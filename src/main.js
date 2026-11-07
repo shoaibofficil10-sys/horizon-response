@@ -396,3 +396,42 @@ if(quoteDialog) {
   });
   document.getElementById('quote-edit').addEventListener('click',()=>{quoteForm.hidden=false;quoteResult.hidden=true;document.getElementById('quote-name').focus();});
 }
+
+// Compose locally; delivery is handed to the visitor's email application.
+const emailDialog = document.getElementById('email-dialog');
+if (emailDialog) {
+  const emailForm = document.getElementById('email-form');
+  const emailResult = document.getElementById('email-result');
+  const emailStatus = document.getElementById('email-status');
+  let emailDraft = '';
+  document.querySelectorAll('[data-open-email]').forEach(trigger => trigger.addEventListener('click', event => {
+    event.preventDefault();
+    if (header.classList.contains('mega-open')) closeMega();
+    closeMenu(); openDialog(emailDialog);
+    (emailForm.hidden ? emailResult.querySelector('h3') : document.getElementById('email-name')).focus();
+  }));
+  emailForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const data = new FormData(emailForm);
+    const name = data.get('name').trim(), reply = data.get('email').trim();
+    const subject = data.get('subject').trim(), message = data.get('message').trim();
+    if (!name || !subject || !message) {
+      const empty = [...emailForm.querySelectorAll('[required]')].find(field => !field.value.trim());
+      empty.setCustomValidity('Please complete this field.'); empty.reportValidity(); return;
+    }
+    const body = `${message}\n\nName: ${name}\nReply email: ${reply}`;
+    emailDraft = `To: info@horizonresponse.example\nSubject: ${subject}\n\n${body}`;
+    document.getElementById('email-preview').textContent = emailDraft;
+    document.getElementById('email-open-app').href = `mailto:info@horizonresponse.example?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    emailForm.hidden = true; emailResult.hidden = false; emailStatus.textContent = '';
+    emailResult.querySelector('h3').focus();
+  });
+  emailForm.querySelectorAll('[required]').forEach(field => field.addEventListener('input', () => field.setCustomValidity('')));
+  document.getElementById('email-copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(emailDraft); emailStatus.textContent = 'Draft copied. Nothing has been sent.'; }
+    catch { emailStatus.textContent = 'Clipboard unavailable. Select and copy the draft above.'; }
+  });
+  document.getElementById('email-edit').addEventListener('click', () => {
+    emailResult.hidden = true; emailForm.hidden = false; document.getElementById('email-message').focus();
+  });
+}

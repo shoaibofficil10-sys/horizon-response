@@ -45,7 +45,7 @@ test('brief builder validates fields and downloads the user’s actual requireme
 
   await page.getByRole('button', { name: 'Prepare my security brief' }).click();
   await expect(page.locator('#brief-dialog')).not.toBeVisible();
-  await page.getByLabel('Your name').fill('Alex Example');
+  await page.locator('#brief-form').getByLabel('Your name').fill('Alex Example');
   await page.getByLabel('Email address').fill('alex@example.com');
   await page.getByLabel('Company / organisation').fill('Example Projects');
   await page.getByLabel('Phone / mobile').fill('0400 000 000');
@@ -156,7 +156,7 @@ test('hero lead form validates details and carries them into the full enquiry br
   await page.getByLabel('Site location').fill('Perth, WA');
   await page.getByLabel('What do you have in mind?').fill('Warehouse entry and visitor management.');
 
-  await expect(page.getByLabel('Your name')).toHaveValue('Jamie Example');
+  await expect(page.locator('#brief-form').getByLabel('Your name')).toHaveValue('Jamie Example');
   await expect(page.getByLabel('Email address')).toHaveValue('jamie@example.com');
   await expect(page.getByLabel('Phone / mobile')).toHaveValue('0400 111 222');
   await page.getByRole('button', { name: 'Prepare my security brief' }).click();

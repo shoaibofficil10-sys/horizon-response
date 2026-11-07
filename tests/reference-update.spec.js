@@ -12,14 +12,11 @@ test('Horizon content keeps the reference identity and unsupported claims out of
  await expect(page.locator('.hero-actions a').first()).toHaveAttribute('href','#contact');
 });
 
-test('advantage uses the existing accordion design and keyboard controls',async({page})=>{
- await page.goto('/');const items=page.locator('.horizon-advantage details');
- await expect(items).toHaveCount(7);
- await items.nth(0).locator('summary').click();await expect(items.nth(0)).toHaveAttribute('open','');
- await items.nth(1).locator('summary').focus();await page.keyboard.press('Enter');
- await expect(items.nth(1)).toHaveAttribute('open','');
- await expect(items.nth(0)).not.toHaveAttribute('open','');
- await page.keyboard.press('Space');await expect(items.nth(1)).not.toHaveAttribute('open','');
+test('Why us contains both requested lists and commitment',async({page})=>{
+ await page.goto('/');await expect(page.locator('#advantage-heading')).toHaveText('Why Us?');
+ await expect(page.locator('.why-us-list')).toHaveCount(2);await expect(page.locator('.why-us-list li')).toHaveCount(20);
+ await expect(page.locator('.why-us-list').nth(1)).toContainText('SPAAL');
+ await expect(page.locator('.why-us-commitment')).toContainText('We protect more than property.');
 });
 
 test('quote popup validates inline, traps focus and downloads the selected request honestly',async({page})=>{
@@ -59,5 +56,25 @@ test('reference sections and quote modal remain responsive and accessible',async
   await page.locator('#service-static .quote-trigger').click();
   result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   expect(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
+  await page.keyboard.press('Escape');await page.locator('.header-email').click();
+  result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  expect(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
  }
+});
+
+test('email composer prepares an encoded draft on every page without sending',async({page})=>{
+ const posts=[];page.on('request',request=>{if(request.method()==='POST')posts.push(request.url())});
+ for(const route of ['/','/about/','/contact/']){
+  await page.goto(route);await page.locator('.header-email').click();
+  await expect(page.locator('#email-dialog')).toBeVisible();await expect(page.locator('#email-name')).toBeFocused();
+  await page.locator('#email-name').fill('Alex Test');await page.locator('#email-reply').fill('alex@example.com');
+  await page.locator('#email-subject').fill('Patrols & access #1');await page.locator('#email-message').fill('Please discuss patrols at our site.');
+  await page.getByRole('button',{name:'Prepare email',exact:true}).click();
+  await expect(page.locator('#email-result')).toBeVisible();await expect(page.locator('#email-preview')).toContainText('Alex Test');
+  const href=await page.locator('#email-open-app').getAttribute('href');
+  expect(href).toContain('subject=Patrols%20%26%20access%20%231');expect(href).toContain('alex%40example.com');
+  await page.locator('#email-edit').click();await expect(page.locator('#email-message')).toHaveValue('Please discuss patrols at our site.');
+  await page.keyboard.press('Escape');await expect(page.locator('#email-dialog')).not.toBeVisible();
+ }
+ expect(posts).toEqual([]);
 });

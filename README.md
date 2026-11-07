@@ -108,3 +108,7 @@ Each homepage service card now opens a native Get a Free Quote dialog with prese
 ## Contact placeholder and Why us
 
 The header uses the user-requested dummy email `info@horizonresponse.example` (reserved `.example` domain). Replace it with the confirmed business mailbox before relying on email contact. The former public phone number and keypad are removed; form phone fields remain. Why us links target the homepage Horizon Advantage section. Homepage and About-page company copy were supplied by the user.
+
+## Why us and email composer
+
+Why us now displays the user's supplied two-column service/standards content and commitment. All footer cards share the navy background. Header email opens a browser-local composer on all three pages. Prepare email creates a plain-text preview and an encoded mailto link; copy and edit are supported. The recipient remains the approved reserved dummy address, so the composer explicitly states that nothing has been sent. No delivery backend, mailbox or credentials have been configured.
