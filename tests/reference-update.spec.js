@@ -5,7 +5,7 @@ test('Horizon content keeps the reference identity and unsupported claims out of
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');
  await expect(page.locator('.intro-copy>p')).toHaveCount(4);
  await expect(page.locator('.intro-copy')).toContainText('Horizon Response Services');
- await expect(page.locator('.intro-copy strong')).toHaveCount(4);
+ await expect(page.locator('.intro-copy')).toContainText('trained personnel');
  await expect(page.locator('body')).not.toContainText('Legion');
  await expect(page.locator('body')).not.toContainText('Decades of Experience');
  await expect(page.locator('a[href*="legionsecurity"]')).toHaveCount(0);

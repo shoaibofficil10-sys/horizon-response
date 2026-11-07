@@ -1,27 +1,14 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-test('header phone drops beneath the header with a locked saved number and fixed call link',async({page})=>{
- for(const width of [1440,390]) {
-  await page.setViewportSize({width,height:1000});await page.goto('/');
-  const trigger=page.getByRole('button',{name:'Open security phone keypad'});
-  await trigger.click();const panel=page.locator('#call-dialog');await expect(panel).toBeVisible();
-  await expect(trigger).toHaveAttribute('aria-expanded','true');
-  await panel.evaluate(e=>Promise.all(e.getAnimations().map(a=>a.finished)));
-  const bounds=await panel.boundingBox(),header=await page.locator('.site-header').boundingBox();
-  expect(bounds.y).toBeGreaterThanOrEqual(header.y+header.height);
-  expect(bounds.x).toBeGreaterThanOrEqual(0);expect(bounds.x+bounds.width).toBeLessThanOrEqual(width);
-  await expect(page.locator('#dial-number')).toHaveAttribute('readonly','');
-  await expect(page.locator('#dial-number')).toHaveValue('+61 491 570 006');
-  await page.locator('#dial-number').focus();await page.keyboard.type('123456');
-  await expect(page.locator('#dial-number')).toHaveValue('+61 491 570 006');
-  await expect(page.locator('#dial-call')).toHaveAttribute('href','tel:+61491570006');
-  await expect(page.locator('#dial-clear, #dial-delete, #dial-reset')).toHaveCount(0);
-  await page.emulateMedia({reducedMotion:'reduce'});
-  const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
-  expect(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
-  await page.keyboard.press('Escape');await expect(panel).not.toBeVisible();await expect(trigger).toBeFocused();
+test('header contact and Why us replace the phone across pages',async({page})=>{
+ for(const route of ['/','/about/','/contact/']){
+  await page.goto(route);await expect(page.locator('.header-email')).toBeVisible();await expect(page.locator('.header-email')).toHaveAttribute('href','mailto:info@horizonresponse.example');
+  await expect(page.locator('[href^="tel:"],#call-dialog,[data-open-call]')).toHaveCount(0);
+  await expect(page.locator('.desktop-nav a').filter({hasText:'Why us'})).toHaveAttribute('href',route==='/'?'#why-us':'/#why-us');
  }
+ await page.goto('/');await page.locator('.desktop-nav a').filter({hasText:'Why us'}).click();await expect(page).toHaveURL(/#why-us$/);
+ await expect(page.locator('#why-us')).toBeInViewport();
 });
 
 test('new short homepage section supports keyboard tab selection',async({page})=>{

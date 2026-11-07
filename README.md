@@ -104,3 +104,7 @@ The homepage ends with an editorial testimonial carousel immediately before the 
 A separate Legion Security brief supplied content ideas only. Horizon's original hero photography, green palette, typography, split About and Contact layouts, service cards, navigation and footer are retained. About copy is adapted to Horizon, and the seven Horizon Advantage points use the site's existing FAQ accordion design. No Legion identity, email or credentials are reused.
 
 Each homepage service card now opens a native Get a Free Quote dialog with preselected service and inline validation. Quote requests use the existing browser-local download/copy flow, as the user will provide Horizon's email later. No request is emailed, no email address from the reference is used, and no sent/success or response-time promise is shown.
+
+## Contact placeholder and Why us
+
+The header uses the user-requested dummy email `info@horizonresponse.example` (reserved `.example` domain). Replace it with the confirmed business mailbox before relying on email contact. The former public phone number and keypad are removed; form phone fields remain. Why us links target the homepage Horizon Advantage section. Homepage and About-page company copy were supplied by the user.
